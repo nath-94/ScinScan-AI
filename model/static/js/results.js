@@ -4,10 +4,43 @@ document.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
   const resultData = JSON.parse(localStorage.getItem("skinScanResult"));
 
+  // Variable globale pour stocker les instances de graphiques
+  window.skinScanCharts = {
+    mainChart: null,
+    moleCharts: {},
+  };
+
+  // Gestionnaire pour redimensionner les graphiques lors du changement de taille d'écran
+  const resizeHandler = debounce(() => {
+    // Rafraîchir les graphiques après redimensionnement
+    if (window.skinScanCharts.mainChart) {
+      window.skinScanCharts.mainChart.resize();
+    }
+
+    Object.values(window.skinScanCharts.moleCharts).forEach((chart) => {
+      if (chart) {
+        chart.resize();
+      }
+    });
+  }, 250);
+
+  window.addEventListener("resize", resizeHandler);
+
   if (resultData && resultData.success) {
     displayResults(resultData);
   } else {
     displayError();
+  }
+
+  // Fonction de debounce pour limiter les appels fréquents
+  function debounce(func, wait) {
+    let timeout;
+    return function () {
+      const context = this,
+        args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
   }
 
   function displayResults(data) {
@@ -36,83 +69,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 </div>
                 
-                <div class="results-info">
-                    <div class="result-card">
-                        <div class="result-header">
-                            <h3><i class="fas fa-clipboard-check"></i> Diagnostic préliminaire - Résultat global</h3>
-                        </div>
-                        <div class="result-body">
-                            <div class="result-primary">
-                                <h4>${data.class_full_name} (${
-      data.class_name
-    })</h4>
-                                <p>${data.class_description}</p>
-                            </div>
-                            
-                            <div class="result-details">
-                                <div class="result-item">
-                                    <div class="result-label">Niveau de risque:</div>
-                                    <div class="result-value">
-                                        <span class="badge ${getRiskBadgeClass(
-                                          data.class_risk
-                                        )}">${data.class_risk}</span>
-                                    </div>
-                                </div>
-                                <div class="result-item">
-                                    <div class="result-label">Confiance:</div>
-                                    <div class="result-value">${(
-                                      data.confidence * 100
-                                    ).toFixed(1)}%</div>
-                                </div>
-                                <div class="result-item">
-                                    <div class="result-label">Grains de beauté détectés:</div>
-                                    <div class="result-value">${
-                                      data.total_moles_detected || 1
-                                    }</div>
-                                </div>
-                                <div class="result-item">
-                                    <div class="result-label">Grains de beauté analysés:</div>
-                                    <div class="result-value">${
-                                      data.analyzed_moles || 1
-                                    }</div>
-                                </div>
-                            </div>
-                            
-                            <div class="result-recommendation">
-                                <i class="fas fa-info-circle"></i> ${
-                                  data.recommendation
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 
                 <div class="results-chart">
-                    <h3><i class="fas fa-chart-bar"></i> Probabilités par type de lésion</h3>
 
                     
                     ${generateMoleCharts(data)}
                 </div>
                 
-                <div class="results-table">
-                    <h3><i class="fas fa-table"></i> Détails des prédictions</h3>
-                    <div class="table-responsive">
-                        <table class="results-table-data">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Nom complet</th>
-                                    <th>Probabilité</th>
-                                    <th>Visualisation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${generateTableRows(data)}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
+
                 ${generateMoleDetectionSection(data)}
                 
                 <div class="results-disclaimer">
@@ -131,11 +95,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Créer les graphiques pour chaque grain de beauté détecté
     if (data.all_detections && data.all_detections.length > 1) {
-      data.all_detections.forEach((mole, index) => {
-        if (mole.chart_data) {
-          createMoleChart(mole.chart_data, `mole-chart-${index}`);
-        }
-      });
+      // Petit délai pour laisser le DOM se charger complètement
+      setTimeout(() => {
+        data.all_detections.forEach((mole, index) => {
+          if (mole.chart_data) {
+            createMoleChart(mole.chart_data, `mole-chart-${index}`);
+          }
+        });
+      }, 100);
     }
   }
 
@@ -156,19 +123,25 @@ document.addEventListener("DOMContentLoaded", function () {
       return ""; // Retourner une chaîne vide si aucune détection multiple
     }
 
-    let chartsHTML = "";
+    let chartsHTML = `<h1 class="mole-charts-heading"><i class="fas fa-chart-pie"></i> Probabilités par grain de beauté</h1>`;
 
     // Générer un conteneur de graphique pour chaque grain de beauté détecté
     data.all_detections.forEach((mole, index) => {
       if (mole.chart_data) {
+        const riskBadgeClass = getRiskBadgeClass(mole.class_risk);
+
         // Ajouter un en-tête et un graphique pour chaque grain de beauté
         chartsHTML += `
           <div class="mole-chart-section">
             <h4 class="mole-chart-title">
               <div class="mole-number-indicator">${index + 1}</div> 
-              Grain de beauté #${index + 1} - ${mole.class_full_name} (${
-          mole.class_name
-        })
+              <span class="mole-chart-name">
+                Grain de beauté #${index + 1} - ${mole.class_full_name} 
+                <span class="mole-chart-short-name">(${mole.class_name})</span>
+              </span>
+              <span class="badge ${riskBadgeClass} mole-chart-risk">${
+          mole.class_risk
+        }</span>
             </h4>
             <div class="chart-container">
               <canvas id="mole-chart-${index}"></canvas>
@@ -316,6 +289,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById("results-chart");
     if (!ctx) return;
 
+    // Adapter la taille du canvas au conteneur parent
+    const container = ctx.parentElement;
+    if (container) {
+      ctx.style.width = "100%";
+    }
+
     // Préparer les couleurs
     const backgroundColors = data.labels.map((_, i) =>
       i === data.predicted_index ? "#4361ee" : "#e9ecef"
@@ -343,6 +322,17 @@ document.addEventListener("DOMContentLoaded", function () {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        resizeDelay: 100, // Ajouter un délai pour le redimensionnement
+        onResize: (chart, size) => {
+          // Optimisation pour les petits écrans
+          if (size.width < 500) {
+            chart.options.scales.x.ticks.maxRotation = 90;
+            chart.options.scales.x.ticks.minRotation = 45;
+          } else {
+            chart.options.scales.x.ticks.maxRotation = 45;
+            chart.options.scales.x.ticks.minRotation = 0;
+          }
+        },
         scales: {
           y: {
             beginAtZero: true,
@@ -390,6 +380,9 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       },
     });
+
+    // Stocker le graphique principal dans notre variable globale
+    window.skinScanCharts.mainChart = chart;
   }
 
   // Fonction pour créer un graphique pour un grain de beauté spécifique
@@ -397,6 +390,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById(chartId);
     if (!ctx) return;
 
+    // Extraire l'ID numérique du chartId (mole-chart-1 => 1)
+    const moleIndex = chartId.split("-").pop();
+
+    // Adapter la taille du canvas au conteneur parent
+    const container = ctx.parentElement;
+    if (container) {
+      ctx.style.width = "100%";
+    }
+
     // Préparer les couleurs
     const backgroundColors = data.labels.map((_, i) =>
       i === data.predicted_index ? "#4361ee" : "#e9ecef"
@@ -424,6 +426,17 @@ document.addEventListener("DOMContentLoaded", function () {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        resizeDelay: 100, // Ajouter un délai pour le redimensionnement
+        onResize: (chart, size) => {
+          // Optimisation pour les petits écrans
+          if (size.width < 400) {
+            chart.options.scales.x.ticks.maxRotation = 90;
+            chart.options.scales.x.ticks.minRotation = 45;
+          } else {
+            chart.options.scales.x.ticks.maxRotation = 45;
+            chart.options.scales.x.ticks.minRotation = 0;
+          }
+        },
         scales: {
           y: {
             beginAtZero: true,
@@ -471,5 +484,8 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       },
     });
+
+    // Stocker le graphique du grain de beauté dans notre variable globale
+    window.skinScanCharts.moleCharts[moleIndex] = chart;
   }
 });
