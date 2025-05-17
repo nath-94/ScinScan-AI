@@ -64,11 +64,55 @@ la peau{% endblock %} {% block extra_css %}
       </div>
 
       <div class="upload-actions">
+          <button id="additional-info-btn" class="btn btn-secondary">
+            <i class="fas fa-notes-medical"></i> Ajouter des informations
+        </button>
         <button id="analyze-btn" class="btn btn-primary btn-analyze" disabled>
           <i class="fas fa-search"></i> Analyser l'image
         </button>
       </div>
-
+<div id="diagnostic-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Informations supplémentaires</h3>
+    </div>
+    <div class="modal-body">
+      <form id="diagnostic-form">
+        <div class="form-group">
+          <label>Depuis quand avez-vous remarqué cette lésion ?</label>
+          <select name="duration" class="form-control">
+            <option value="recent">Moins d'un mois</option>
+            <option value="medium">1-6 mois</option>
+            <option value="long">Plus de 6 mois</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>La lésion a-t-elle changé récemment ?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="changed" value="yes"> Oui</label>
+            <label><input type="radio" name="changed" value="no"> Non</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ressentez-vous des symptômes ?</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" name="symptoms" value="itching"> Démangeaisons</label>
+            <label><input type="checkbox" name="symptoms" value="pain"> Douleur</label>
+            <label><input type="checkbox" name="symptoms" value="bleeding"> Saignement</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes supplémentaires</label>
+          <textarea name="notes" class="form-control" rows="3"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancel-diagnostic">Annuler</button>
+      <button class="btn btn-primary" id="save-diagnostic">Enregistrer</button>
+    </div>
+  </div>
+</div>
       <div id="upload-status" class="upload-status">
         <div class="spinner" id="spinner">
           <i class="fas fa-spinner fa-spin"></i>
@@ -799,6 +843,47 @@ la peau{% endblock %} {% block extra_css %}
       resultsContainer.innerHTML = `<div class="search-error"><i class="fas fa-exclamation-circle"></i> ${e}</div>`;
     }
   }
+</script>
+<script>
+const diagnosticModal = document.getElementById('diagnostic-modal');
+const additionalInfoBtn = document.getElementById('additional-info-btn');
+const closeBtn = document.querySelector('.close');
+const cancelBtn = document.getElementById('cancel-diagnostic');
+const saveBtn = document.getElementById('save-diagnostic');
+
+// Ouvrir le modal
+additionalInfoBtn.addEventListener('click', () => {
+  diagnosticModal.style.display = 'block'; // Utiliser display au lieu de classe
+});
+
+// Fermer le modal
+function closeModal() {
+  diagnosticModal.style.display = 'none';  // Utiliser display au lieu de classe
+}
+
+// Ajouter les écouteurs d'événements
+if (cancelBtn) {
+  cancelBtn.addEventListener('click', closeModal);
+}
+if (closeBtn) {
+  closeBtn.addEventListener('click', closeModal);
+}
+if (saveBtn) {
+  saveBtn.addEventListener('click', () => {
+    const form = document.getElementById('diagnostic-form');
+    const diagnosticData = Object.fromEntries(new FormData(form));
+    console.log('Données diagnostiques :', diagnosticData);
+    closeModal();
+  });
+}
+
+// Fermer si clic en dehors
+window.addEventListener('click', (e) => {
+  if (e.target === diagnosticModal) {
+    closeModal();
+  }
+});
+
 </script>
 
 <section id="about" class="about-section">
