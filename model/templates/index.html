@@ -154,8 +154,8 @@ la peau{% endblock %} {% block extra_css %}
         .getContext("2d")
         .drawImage(video, 0, 0, canvas.width, canvas.height);
       canvas.toBlob(function (blob) {
-        const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
-        const dataTransfer = new DataTransfer();
+        const uniqueName = `photo_${Date.now()}.jpg`;      // <- horodatage
+        const file = new File([blob], uniqueName, { type: "image/jpeg" });        const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
         fileInput.files = dataTransfer.files;
 
@@ -294,10 +294,10 @@ la peau{% endblock %} {% block extra_css %}
             <label class="filter-option">
               <input type="checkbox" id="filterSecteur2" checked /> Secteur 2
             </label>
-            <label class="filter-option">
+            <!-- <label class="filter-option">
               <input type="checkbox" id="filterCartevitale" checked /> Carte
               Vitale
-            </label>
+            </label> -->
           </div>
         </div>
 
@@ -404,8 +404,7 @@ la peau{% endblock %} {% block extra_css %}
     // Récupérer les filtres
     const showSecteur1 = document.getElementById("filterSecteur1").checked;
     const showSecteur2 = document.getElementById("filterSecteur2").checked;
-    const showCarteVitale =
-      document.getElementById("filterCartevitale").checked;
+    const bounds = map.getBounds();
 
     // Afficher les résultats
     const resultsContainer = document.getElementById("searchResults");
@@ -420,6 +419,14 @@ la peau{% endblock %} {% block extra_css %}
         return;
       }
 
+      const lat = doctor.geometry.coordinates[1];
+      const lng = doctor.geometry.coordinates[0];
+
+      // Vérifier si le médecin est dans les limites de la carte
+      if (!bounds.contains([lat, lng])) {
+        return; // Ignorer les médecins hors de la vue
+      }
+
       const props = doctor.properties;
       const nom = props["nom"] || "Inconnu";
       const adresse = props["adresse"] || "";
@@ -429,24 +436,19 @@ la peau{% endblock %} {% block extra_css %}
       const secteur =
         props["convention"] === "Secteur 2, Pas de contrat d'accès aux soins"
           ? 2
-          : 1; // Secteur par défaut
-      const carteVitale =
-        props["sesam_vitale"] == "Lecteur de carte Sesam Vitale" ? true : false; // Par défaut true
+          : 1;
 
-      // Appliquer les filtres
-      if ((secteur === 1 && !showSecteur1) || (secteur === 2 && !showSecteur2))
+      // Appliquer les filtres de secteur
+      if ((secteur === 1 && !showSecteur1) || (secteur === 2 && !showSecteur2)) {
         return;
-      if (showCarteVitale && !carteVitale) return;
+      }
 
       visibleDoctors++;
 
       // Créer le marqueur avec l'icône personnalisée selon le secteur
-      const marker = L.marker(
-        [doctor.geometry.coordinates[1], doctor.geometry.coordinates[0]],
-        {
-          icon: createCustomIcon(secteur),
-        }
-      );
+      const marker = L.marker([lat, lng], {
+        icon: createCustomIcon(secteur),
+      });
 
       // Créer une popup personnalisée
       const popupContent = `
@@ -456,49 +458,51 @@ la peau{% endblock %} {% block extra_css %}
           <p><i class="fas fa-map-marker-alt"></i> ${adresse}</p>
           <p><i class="fas fa-city"></i> ${cp} ${ville}</p>
           <p><i class="fas fa-money-bill-wave"></i> Secteur ${secteur}</p>
-          ${
-            carteVitale
-              ? '<p><i class="fas fa-credit-card"></i> Carte Vitale acceptée</p>'
-              : ""
-          }
           <a href="https://www.google.com/maps/search/${encodeURIComponent(
             `${nom} ${adresse} ${ville}`
-          )}" target="_blank" class="btn btn-sm btn-primary">Itinéraire</a>
+          )}" target="_blank" style="color: white" class="btn btn-sm btn-primary">Itinéraire</a>
         </div>
       `;
 
       marker.bindPopup(popupContent);
       markersLayer.addLayer(marker);
 
-      // Ajouter au panel de résultats s'il y en a 10 ou moins
-      if (visibleDoctors <= 10) {
-        const doctorCard = document.createElement("div");
-        doctorCard.className = "search-result-item";
-        doctorCard.innerHTML = `
-          <h4>${nom}</h4>
-          <p>${specialite} - Secteur ${secteur}</p>
-          <p>${adresse}, ${cp} ${ville}</p>
-        `;
-        doctorCard.addEventListener("click", () => {
-          // On sait déjà que les coordonnées existent car on a filtré plus haut
-          map.setView(
-            [doctor.geometry.coordinates[1], doctor.geometry.coordinates[0]],
-            15
-          );
-          marker.openPopup();
-        });
-        resultsContainer.appendChild(doctorCard);
-      }
+      // Ajouter au panel de résultats
+      const doctorCard = document.createElement("div");
+      doctorCard.className = "search-result-item";
+      doctorCard.innerHTML = `
+        <h4>${nom}</h4>
+        <p>${specialite} - Secteur ${secteur}</p>
+        <p>${adresse}, ${cp} ${ville}</p>
+      `;
+      doctorCard.addEventListener("click", () => {
+        map.setView([lat, lng], 15);
+        marker.openPopup();
+
+        document.querySelectorAll('.search-result-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    doctorCard.classList.add('active');
+      });
+      resultsContainer.appendChild(doctorCard);
     });
 
     // Mettre à jour le nombre total
-    if (visibleDoctors > 10) {
+    if (visibleDoctors === 0) {
+      resultsContainer.innerHTML = `<div class="no-results">
+        Aucun dermatologue trouvé dans cette zone. 
+        Déplacez la carte ou effectuez un zoom arrière pour voir plus de résultats.
+      </div>`;
+    } else {
       const countInfo = document.createElement("div");
       countInfo.className = "results-count";
-      countInfo.textContent = `${visibleDoctors} dermatologues trouvés. Affinez votre recherche pour de meilleurs résultats.`;
-      resultsContainer.appendChild(countInfo);
+      countInfo.textContent = `${visibleDoctors} dermatologues trouvés dans cette zone`;
+      resultsContainer.insertBefore(countInfo, resultsContainer.firstChild);
     }
-  }
+}
+
+// Ajouter l'écouteur d'événements pour mettre à jour la liste lors du déplacement de la carte
+map.on('moveend', displayDoctors);
 
   // Gestion des filtres
   document
@@ -507,9 +511,9 @@ la peau{% endblock %} {% block extra_css %}
   document
     .getElementById("filterSecteur2")
     .addEventListener("change", displayDoctors);
-  document
-    .getElementById("filterCartevitale")
-    .addEventListener("change", displayDoctors);
+//   document
+//     .getElementById("filterCartevitale")
+//     .addEventListener("change", displayDoctors);
 
   // Géocodage avec Nominatim
   async function geocode(city) {
