@@ -101,8 +101,30 @@ la peau{% endblock %} {% block extra_css %}
           text-align: center;
         "
       >
-        <video id="video" width="320" height="240" autoplay></video>
+        <video id="video" width="480" height="360" autoplay></video>
+        <img
+          id="detection-stream"
+          src=""
+          width="480"
+          height="360"
+          style="display: none"
+        />
         <br />
+        <div
+          class="detection-toggle"
+          style="
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <span style="margin-right: 10px">Détection en direct:</span>
+          <label class="switch">
+            <input type="checkbox" id="detection-toggle" />
+            <span class="slider round"></span>
+          </label>
+        </div>
         <button id="take-photo-btn" class="btn btn-primary" type="button">
           Capturer
         </button>
@@ -111,18 +133,78 @@ la peau{% endblock %} {% block extra_css %}
         </button>
         <canvas
           id="canvas"
-          width="320"
-          height="240"
+          width="480"
+          height="360"
           style="display: none"
         ></canvas>
       </div>
     </div>
   </div>
 </section>
+
+<style>
+  /* Style pour le toggle switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+  }
+
+  input:checked + .slider {
+    background-color: #2196f3;
+  }
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196f3;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+</style>
 <script>
   const openCameraBtn = document.getElementById("open-camera-btn");
   const cameraModal = document.getElementById("camera-modal");
   const video = document.getElementById("video");
+  const detectionStream = document.getElementById("detection-stream");
+  const detectionToggle = document.getElementById("detection-toggle");
   const takePhotoBtn = document.getElementById("take-photo-btn");
   const closeCameraBtn = document.getElementById("close-camera-btn");
   const canvas = document.getElementById("canvas");
@@ -130,44 +212,195 @@ la peau{% endblock %} {% block extra_css %}
   const previewImage = document.getElementById("preview-image");
 
   let stream = null;
+  let isDetectionActive = false;
+  let streamCheckTimer = null;
+
+  // Fonction pour démarrer la détection en temps réel
+  async function startRealTimeDetection() {
+    try {
+      // Appeler l'API pour démarrer la détection vidéo
+      const response = await fetch("/video/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Cacher la vidéo régulière et montrer le flux de détection
+        video.style.display = "none";
+        detectionStream.style.display = "block";
+
+        // Configurer la source du flux vidéo avec timestamping pour éviter le cache
+        detectionStream.src = `/video/stream?t=${Date.now()}`;
+        isDetectionActive = true;
+
+        // Vérifier que le stream fonctionne, avec un délai pour permettre son chargement
+        streamCheckTimer = setTimeout(() => {
+          if (!detectionStream.complete) {
+            console.error(
+              "Le flux de détection ne s'est pas chargé correctement"
+            );
+            // Retomber sur la vidéo normale
+            stopRealTimeDetection();
+            detectionToggle.checked = false;
+            alert(
+              "La détection en temps réel n'a pas pu être activée. Veuillez réessayer."
+            );
+          }
+        }, 3000);
+      } else {
+        console.error(
+          "Erreur lors de l'initialisation de la détection en temps réel"
+        );
+        detectionToggle.checked = false;
+      }
+    } catch (error) {
+      console.error("Erreur:", error);
+      detectionToggle.checked = false;
+    }
+  }
+
+  // Fonction pour arrêter la détection en temps réel
+  async function stopRealTimeDetection() {
+    if (!isDetectionActive) return;
+
+    try {
+      // Arrêter le timer de vérification du stream s'il est actif
+      if (streamCheckTimer) {
+        clearTimeout(streamCheckTimer);
+        streamCheckTimer = null;
+      }
+
+      // Appeler l'API pour arrêter la détection
+      const response = await fetch("/video/stop", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Cacher le flux de détection et montrer la vidéo régulière
+        detectionStream.style.display = "none";
+        video.style.display = "block";
+        isDetectionActive = false;
+
+        // Arrêter le stream
+        detectionStream.src = "";
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'arrêt de la détection:", error);
+    }
+  }
 
   if (openCameraBtn) {
     openCameraBtn.onclick = async function () {
       cameraModal.style.display = "flex";
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+          },
+        });
+        video.srcObject = stream;
+      } catch (err) {
+        console.error("Erreur d'accès à la caméra:", err);
+        alert(
+          "Impossible d'accéder à la caméra. Veuillez vérifier les permissions."
+        );
+      }
+
+      // Réinitialiser le toggle de détection
+      detectionToggle.checked = false;
+
+      // S'assurer que la vidéo normale est affichée
+      video.style.display = "block";
+      detectionStream.style.display = "none";
     };
   }
 
   if (closeCameraBtn) {
     closeCameraBtn.onclick = function () {
+      // Arrêter la détection si elle est active
+      if (isDetectionActive) {
+        stopRealTimeDetection();
+      }
+
+      // Fermer la modale et arrêter le stream
       cameraModal.style.display = "none";
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
+        stream = null;
+      }
+    };
+  }
+
+  if (detectionToggle) {
+    detectionToggle.onchange = function () {
+      if (this.checked) {
+        startRealTimeDetection();
+      } else {
+        stopRealTimeDetection();
       }
     };
   }
 
   if (takePhotoBtn) {
     takePhotoBtn.onclick = function () {
-      canvas
-        .getContext("2d")
-        .drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(function (blob) {
-        const uniqueName = `photo_${Date.now()}.jpg`;      // <- horodatage
-        const file = new File([blob], uniqueName, { type: "image/jpeg" });        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        fileInput.files = dataTransfer.files;
-
-        const url = URL.createObjectURL(blob);
-        if (previewImage) previewImage.src = url;
-
-        cameraModal.style.display = "none";
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
+      try {
+        // Si la détection est active, utiliser l'image de détection
+        if (isDetectionActive) {
+          canvas
+            .getContext("2d")
+            .drawImage(detectionStream, 0, 0, canvas.width, canvas.height);
+        } else {
+          // Sinon utiliser la vidéo normale
+          canvas
+            .getContext("2d")
+            .drawImage(video, 0, 0, canvas.width, canvas.height);
         }
-        fileInput.dispatchEvent(new Event("change"));
-      }, "image/jpeg");
+
+        canvas.toBlob(function (blob) {
+          const uniqueName = `photo_${Date.now()}.jpg`; // <- horodatage
+          const file = new File([blob], uniqueName, { type: "image/jpeg" });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+
+          const url = URL.createObjectURL(blob);
+          if (previewImage) previewImage.src = url;
+
+          // Arrêter la détection si elle est active
+          if (isDetectionActive) {
+            stopRealTimeDetection();
+          }
+
+          cameraModal.style.display = "none";
+          if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+            stream = null;
+          }
+
+          // Signaler que l'input a changé pour déclencher le preview
+          fileInput.dispatchEvent(new Event("change"));
+        }, "image/jpeg");
+      } catch (err) {
+        console.error("Erreur lors de la capture:", err);
+        alert("Une erreur est survenue lors de la capture de l'image.");
+      }
+    };
+  }
+
+  // Ajouter un gestionnaire d'erreur pour le stream de détection
+  if (detectionStream) {
+    detectionStream.onerror = function (err) {
+      console.error("Erreur de chargement du stream:", err);
+      // Revenir à la vidéo normale
+      detectionToggle.checked = false;
+      stopRealTimeDetection();
     };
   }
 </script>
@@ -439,7 +672,10 @@ la peau{% endblock %} {% block extra_css %}
           : 1;
 
       // Appliquer les filtres de secteur
-      if ((secteur === 1 && !showSecteur1) || (secteur === 2 && !showSecteur2)) {
+      if (
+        (secteur === 1 && !showSecteur1) ||
+        (secteur === 2 && !showSecteur2)
+      ) {
         return;
       }
 
@@ -479,10 +715,10 @@ la peau{% endblock %} {% block extra_css %}
         map.setView([lat, lng], 15);
         marker.openPopup();
 
-        document.querySelectorAll('.search-result-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    doctorCard.classList.add('active');
+        document.querySelectorAll(".search-result-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+        doctorCard.classList.add("active");
       });
       resultsContainer.appendChild(doctorCard);
     });
@@ -499,10 +735,10 @@ la peau{% endblock %} {% block extra_css %}
       countInfo.textContent = `${visibleDoctors} dermatologues trouvés dans cette zone`;
       resultsContainer.insertBefore(countInfo, resultsContainer.firstChild);
     }
-}
+  }
 
-// Ajouter l'écouteur d'événements pour mettre à jour la liste lors du déplacement de la carte
-map.on('moveend', displayDoctors);
+  // Ajouter l'écouteur d'événements pour mettre à jour la liste lors du déplacement de la carte
+  map.on("moveend", displayDoctors);
 
   // Gestion des filtres
   document
@@ -511,9 +747,9 @@ map.on('moveend', displayDoctors);
   document
     .getElementById("filterSecteur2")
     .addEventListener("change", displayDoctors);
-//   document
-//     .getElementById("filterCartevitale")
-//     .addEventListener("change", displayDoctors);
+  //   document
+  //     .getElementById("filterCartevitale")
+  //     .addEventListener("change", displayDoctors);
 
   // Géocodage avec Nominatim
   async function geocode(city) {
