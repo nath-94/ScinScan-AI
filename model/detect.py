@@ -39,7 +39,9 @@ def formater_resultats_yolo(results, image_width, image_height, class_names, out
 
 
 def detect(image_path:str):
-    model_path="model/best.pt"
+    import os
+    # Utiliser un chemin absolu pour le modèle
+    model_path = os.path.join(os.path.dirname(__file__), "best.pt")
     model = YOLO(model_path)
     results = model(image_path)
     class_names = ["mole"]  # Ou plus de classes si tu en as
