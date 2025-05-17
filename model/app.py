@@ -9,13 +9,14 @@ import cv2
 from PIL import Image as PILImage
 matplotlib.use('Agg')  # Utiliser le backend Agg pour matplotlib
 import matplotlib.pyplot as plt
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, Response
 from werkzeug.utils import secure_filename
 import io
 import base64
 import json
 
 from detect import detect  # Importer la fonction detect
+# Le module de détection vidéo sera importé plus bas dans le code pour éviter les imports circulaires
 
 # Configuration de l'application Flask
 app = Flask(__name__)
@@ -445,7 +446,7 @@ def draw_bounding_boxes(img_path, detections, save_path=None):
     
     # Définir les couleurs (BGR)
     box_color = (0, 255, 0)  # Green
-    text_color = (255, 255, 255)  # Blanc
+    text_color = (0, 0, 0)  # Noir
     high_risk_box_color = (0, 0, 255)  # Rouge pour les grains à risque élevé
     
     # Pour chaque détection
@@ -468,7 +469,7 @@ def draw_bounding_boxes(img_path, detections, save_path=None):
         cv2.rectangle(annotated_img, (x1, y1), (x2, y2), current_box_color, thickness)
         
         # Créer un cercle plus visible pour le numéro
-        circle_radius = 14
+        circle_radius = 10
         center = (x1 + circle_radius + 4, y1 + circle_radius + 4)
         cv2.circle(annotated_img, center, circle_radius, current_box_color, -1)
         
@@ -589,9 +590,105 @@ def uploaded_file(filename):
     # Sinon, chercher dans le dossier uploads de l'application
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/video/start', methods=['POST'])
+def start_video_detection():
+    """Démarre la détection vidéo en temps réel"""
+    # Importer le module ici pour éviter les imports circulaires
+    from video_detection import video_detector
+    
+    success = video_detector.start_detection()
+    return json.dumps({'success': success})
+
+@app.route('/video/stop', methods=['POST'])
+def stop_video_detection():
+    """Arrête la détection vidéo en temps réel"""
+    # Importer le module ici pour éviter les imports circulaires
+    from video_detection import video_detector
+    
+    success = video_detector.stop_detection()
+    return json.dumps({'success': success})
+
+@app.route('/video/stream')
+def video_stream():
+    """Flux vidéo pour la détection en temps réel"""
+    # Importer le module ici pour éviter les imports circulaires
+    from video_detection import video_detector
+    
+    return Response(
+        video_detector.generate_frames(),
+        mimetype='multipart/x-mixed-replace; boundary=frame'
+    )
+
+# Fonction pour générer un flux vidéo avec détection en temps réel
+def generate_video():
+    """Génère un flux vidéo avec détection en temps réel."""
+    # Initialiser la capture vidéo
+    cap = cv2.VideoCapture(0)
+    
+    # Vérifier si la caméra s'ouvre correctement
+    if not cap.isOpened():
+        yield b"Erreur: Impossible d'ouvrir la camera."
+        return
+    
+    # Charger le modèle de détection
+    model = create_model()
+    
+    while True:
+        # Lire une image de la caméra
+        ret, frame = cap.read()
+        if not ret:
+            yield b"Erreur: Impossible de lire l'image de la camera."
+            break
+        
+        # Convertir l'image en RGB
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
+        # Redimensionner l'image pour le modèle
+        img_resized = cv2.resize(frame_rgb, (224, 224))
+        img_array = np.array(img_resized) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        
+        # Faire la prédiction
+        predictions = model.predict(img_array)
+        predicted_class_index = np.argmax(predictions, axis=1)[0]
+        predicted_class = class_names[predicted_class_index]
+        
+        # Dessiner la boîte englobante et le label sur l'image
+        draw_detections(frame, predictions, class_names)
+        
+        # Encoder l'image annotée en JPEG
+        _, buffer = cv2.imencode('.jpg', frame)
+        frame_jpg = buffer.tobytes()
+        
+        # Yields a byte string for the video stream
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_jpg + b'\r\n')
+
+    # Libérer la capture vidéo à la fin
+    cap.release()
+
+def draw_detections(frame, predictions, class_names):
+    """Dessine les détections sur l'image du flux vidéo."""
+    # Palette de couleurs moderne
+    colors = ['#e9ecef' for _ in range(len(class_names))]
+    predicted_class_index = np.argmax(predictions, axis=1)[0]
+    colors[predicted_class_index] = '#4361ee'  # Bleu vif pour la classe prédite
+    
+    for i, color in enumerate(colors):
+        if i == predicted_class_index:
+            continue  # Ne pas dessiner une deuxième fois la classe prédite
+        
+        # Dessiner une boîte englobante pour chaque classe
+        cv2.rectangle(frame, (10, 30 + i * 30), (300, 60 + i * 30), color, -1)
+        cv2.putText(frame, class_names[i], (15, 50 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+    
+    # Dessiner la boîte et le label pour la classe prédite
+    cv2.rectangle(frame, (10, 30 + predicted_class_index * 30), (300, 60 + predicted_class_index * 30), colors[predicted_class_index], -1)
+    cv2.putText(frame, class_names[predicted_class_index], (15, 50 + predicted_class_index * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+
 #if __name__ == '__main__':
  #   app.run(debug=True, host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5000))  # Changed to port 5000
     app.run(host='0.0.0.0', port=port, debug=True)
