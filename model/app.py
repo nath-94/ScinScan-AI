@@ -214,16 +214,27 @@ def process_detected_moles(img_path):
                 predictions = detection_result['predictions']['predictions']
             else:
                 print("Format de résultat inattendu: les prédictions sont introuvables.")
-                return predict_image(img_path)
+                return {
+                    'success': False,
+                    'error': "Aucun grain de beauté détecté sur l'image",
+                    'no_moles_detected': True
+                }
         else:
             print("Aucun grain de beauté détecté dans l'image.")
-            return predict_image(img_path)
+            return {
+                'success': False,
+                'error': "Aucun grain de beauté détecté sur l'image",
+                'no_moles_detected': True
+            }
         
         # Vérifier si des objets ont été détectés
         if not predictions or len(predictions) == 0:
             print("Aucun grain de beauté détecté dans l'image.")
-            # Si aucun grain de beauté n'est détecté, utiliser l'image entière
-            return predict_image(img_path)
+            return {
+                'success': False,
+                'error': "Aucun grain de beauté détecté sur l'image",
+                'no_moles_detected': True  # Indicateur spécifique pour cette situation
+            }
         
         # Lire l'image originale
         original_img = cv2.imread(img_path)
@@ -244,7 +255,6 @@ def process_detected_moles(img_path):
             width = prediction['width']
             height = prediction['height']
             confidence = prediction.get('confidence', 0)
-            
             # Si la confiance est trop faible, ignorer cette détection
             if confidence < 0.5:
                 continue
@@ -281,7 +291,7 @@ def process_detected_moles(img_path):
                 y2 = min(img_height, center_y + 20)
             
             # Élargir légèrement la zone pour s'assurer que tout le grain de beauté est inclus
-            padding = 20  # Augmenter le padding
+            padding = 2  # Augmenter le padding
             x1 = max(0, x1 - padding)
             y1 = max(0, y1 - padding)
             x2 = min(img_width, x2 + padding)
@@ -319,12 +329,13 @@ def process_detected_moles(img_path):
                 print(f"Erreur lors du traitement du grain de beauté {i}: {e}")
                 continue
         
-        # Si aucun grain de beauté n'a été analysé avec succès, utiliser l'image entière
+        # Si aucun grain de beauté n'a été analysé avec succès, retourner un message d'erreur
         if not mole_results:
-            result = predict_image(img_path)
-            # Ajouter l'indicateur de risque élevé (single mole case)
-            result['has_high_risk'] = is_high_risk(result.get('class_risk', ''))
-            return result
+            return {
+                'success': False,
+                'error': "Aucun grain de beauté détecté sur l'image",
+                'no_moles_detected': True  # Indicateur spécifique pour cette situation
+            }
         
         # Trouver le résultat avec le risque le plus élevé
         highest_risk_result = max(mole_results, key=lambda r: get_risk_score(r['class_risk']))
@@ -420,6 +431,12 @@ def draw_bounding_boxes(img_path, detections, save_path=None):
         image = cv2.imread(parent_img_path)
         
         if image is None:
+            print(f"Image introuvable dans les deux emplacements.")
+            return {
+                'success': False,
+                'error': "Impossible de lire l'image. Vérifiez le format et réessayez.",
+                'no_moles_detected': False
+            }
             print(f"Image introuvable dans les deux emplacements.")
             return None
     
@@ -528,7 +545,15 @@ def index():
                     }
                     return json.dumps(safe_result)
             else:
-                return json.dumps({'success': False, 'error': result['error']}), 500
+                # Vérifier si c'est le cas spécifique où aucun grain de beauté n'est détecté
+                if 'no_moles_detected' in result:
+                    return json.dumps({
+                        'success': False, 
+                        'error': result['error'], 
+                        'no_moles_detected': True
+                    }), 400  # 400 au lieu de 500 car ce n'est pas une erreur technique
+                else:
+                    return json.dumps({'success': False, 'error': result['error']}), 500
         else:
             return json.dumps({'success': False, 'error': 'Type de fichier non autorisé. Utilisez JPG, JPEG ou PNG.'}), 400
     
