@@ -182,6 +182,27 @@
   gap: 10px;
 }
 
+.footer-links {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.footer-links a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #333;
+}
+
+.footer-links .separator {
+    margin: 0 10px;
+    color: #666;
+}
+
 .upload-preview {
   display: none;
   width: 100%;

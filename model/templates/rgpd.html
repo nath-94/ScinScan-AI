@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/rgpd.css') }}">
+{% endblock %}
+
+{% block title %}Mentions légales | SkinScan-AI{% endblock %}
+
+{% block content %}
+<section class="legal-section">
+    <div class="container">
+          <h1>Protection des données personnelles — SkinScan‑AI</h1>
+  <p>SkinScan‑AI s’engage à assurer la protection, la confidentialité et la sécurité des données traitées dans le cadre de son application de sensibilisation au dépistage du mélanome. L'application est conçue dans un objectif éducatif, préventif et non médical.</p>
+
+  <section id="responsable-traitement">
+    <h2>1. Responsable du traitement</h2>
+    <p>SkinScan‑AI est responsable du traitement des données transitant par l’application. Les traitements réalisés respectent le Règlement général sur la protection des données (RGPD) et la loi Informatique et Libertés modifiée.</p>
+    <p>Aucune donnée personnelle ou médicale n’est conservée de façon permanente par l’application. Les images analysées sont traitées temporairement, sans identification possible, et ne sont ni stockées ni transmises à des tiers.</p>
+  </section>
+
+  <section id="donnees-finalites">
+    <h2>2. Données collectées et finalités</h2>
+    <p>SkinScan‑AI ne crée aucun compte utilisateur et ne collecte pas d'informations nominatives (nom, email, IP, etc.).</p>
+    <p>Les images soumises sont utilisées uniquement pour produire une analyse locale ou temporaire, puis immédiatement supprimées après traitement. Aucune base de données n'est constituée, et aucune analyse secondaire ou commerciale n'est réalisée.</p>
+    <p>La finalité est exclusivement préventive, éducative et de sensibilisation à la détection précoce du mélanome cutané.</p>
+  </section>
+
+  <section id="hebergement-securite">
+    <h2>3. Hébergement et sécurité</h2>
+    <p>L’application est hébergée par :</p>
+    <address>
+      Amazon Web Services (AWS)<br />
+      31 place des Corolles, Tour Carpe Diem,<br />
+      92400 Courbevoie – France
+    </address>
+    <p>AWS est certifié Hébergeur de Données de Santé (HDS) et conforme au RGPD.</p>
+    <p>Nous utilisons des services de traitement localisés en Europe (région Paris – eu‑west‑3) avec chiffrement et journalisation d’accès. Aucune image ni donnée personnelle n’est conservée au-delà du temps d’analyse immédiate.</p>
+  </section>
+
+  <section id="mesures-securite">
+    <h2>4. Sécurité et confidentialité</h2>
+    <p>Nous appliquons des mesures techniques et organisationnelles pour garantir :</p>
+    <ul>
+      <li>la non‑conservation des données sensibles,</li>
+      <li>la non‑accessibilité des images par des tiers,</li>
+      <li>une utilisation éphémère et anonyme du service.</li>
+    </ul>
+    <p>L’application ne constitue pas un dispositif médical certifié et ne se substitue en aucun cas à un avis ou à un diagnostic médical professionnel.</p>
+  </section>
+
+  <section id="vos-droits">
+    <h2>5. Vos droits (RGPD)</h2>
+    <p>Conformément aux articles 15 à 22 du RGPD, vous disposez des droits suivants :</p>
+    <ul>
+      <li>Droit d’accès, de rectification ou de suppression, si des données vous concernant étaient collectées (ce qui n’est pas le cas actuellement).</li>
+      <li>Droit d’opposition à tout traitement automatisé à des fins de profilage ou de diffusion.</li>
+      <li>Droit de réclamation auprès de la CNIL si vous estimez que vos droits n’ont pas été respectés.</li>
+    </ul>
+  </section>
+
+  <section id="contact-rgpd">
+    <h2>6. Contact RGPD</h2>
+    <p>Pour toute question relative à la protection de vos données personnelles ou à l’usage de l’application, vous pouvez nous contacter à : <em>[adresse mail RGPD]</em></p>
+  </section>
+    </div>
+</section>
+{% endblock %}
