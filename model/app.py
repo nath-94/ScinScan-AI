@@ -619,6 +619,14 @@ def video_stream():
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
 
+@app.route('/mentions-legales')
+def mentions_legales():
+    return render_template('mention.html')
+
+@app.route('/rgpd')
+def rgpd():
+    return render_template('rgpd.html')
+
 # Fonction pour générer un flux vidéo avec détection en temps réel
 def generate_video():
     """Génère un flux vidéo avec détection en temps réel."""
