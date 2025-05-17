@@ -1,2 +1,5 @@
 skin_cancer_env/
 model/downloaded_model/
+.venv
+__pycache__/
+uploads/
