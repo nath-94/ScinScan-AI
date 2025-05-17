@@ -178,12 +178,15 @@ def predict_image(img_path):
             'predicted_index': int(predicted_class_index)
         }
         
+        predicted_risk = class_risks[predicted_class]
+        
         return {
             'success': True,
             'class_name': predicted_class,
             'class_full_name': class_full_names[predicted_class],
             'class_description': class_descriptions[predicted_class],
-            'class_risk': class_risks[predicted_class],
+            'class_risk': predicted_risk,
+            'has_high_risk': is_high_risk(predicted_risk),
             'recommendation': class_recommendations[predicted_class],
             'confidence': float(predictions[0][predicted_class_index]),
             'graph_img': graph_img,
@@ -318,10 +321,16 @@ def process_detected_moles(img_path):
         
         # Si aucun grain de beauté n'a été analysé avec succès, utiliser l'image entière
         if not mole_results:
-            return predict_image(img_path)
+            result = predict_image(img_path)
+            # Ajouter l'indicateur de risque élevé (single mole case)
+            result['has_high_risk'] = is_high_risk(result.get('class_risk', ''))
+            return result
         
         # Trouver le résultat avec le risque le plus élevé
         highest_risk_result = max(mole_results, key=lambda r: get_risk_score(r['class_risk']))
+        
+        # Vérifier si un des grains de beauté présente un risque supérieur à modéré
+        has_high_risk = any(is_high_risk(result['class_risk']) for result in mole_results)
         
         # Créer une copie modifiable des résultats avec uniquement les données essentielles
         clean_mole_results = []
@@ -350,6 +359,7 @@ def process_detected_moles(img_path):
         highest_risk_result['all_detections'] = clean_mole_results
         highest_risk_result['total_moles_detected'] = len(predictions)
         highest_risk_result['analyzed_moles'] = len(mole_results)
+        highest_risk_result['has_high_risk'] = has_high_risk
         
         # Utiliser la fonction robuste pour générer l'URL de l'image annotée
         if annotated_image_path:
@@ -377,6 +387,11 @@ def get_risk_score(risk_level):
         'Très élevé': 5
     }
     return risk_scores.get(risk_level, 1)
+
+# Fonction pour déterminer si un risque est supérieur à modéré
+def is_high_risk(risk_level):
+    high_risk_levels = ['Modéré à élevé', 'Élevé', 'Très élevé']
+    return risk_level in high_risk_levels
 
 # Fonction pour dessiner les boîtes englobantes sur l'image
 def draw_bounding_boxes(img_path, detections, save_path=None):
