@@ -39,7 +39,8 @@ def formater_resultats_yolo(results, image_width, image_height, class_names, out
 
 
 def detect(image_path:str):
-    model = YOLO("/Users/aaronyazdi/Documents/ScinScan-AI/model/downloaded_model/best.pt")
+    model_path="model/best.pt"
+    model = YOLO(model_path)
     results = model(image_path)
     class_names = ["mole"]  # Ou plus de classes si tu en as
     image_height, image_width = results[0].orig_shape
@@ -49,4 +50,3 @@ def detect(image_path:str):
     json_result = formater_resultats_yolo(results, image_width, image_height, class_names, output_image_b64)
     return [json_result]
 
-print(detect("/Users/aaronyazdi/Documents/ScinScan-AI/model/uploads/grain4.jpg"))
