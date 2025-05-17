@@ -89,9 +89,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 <div class="results-chart">
                     <h3><i class="fas fa-chart-bar"></i> Probabilités par type de lésion</h3>
-                    <div class="chart-container">
-                        <canvas id="results-chart"></canvas>
-                    </div>
+
+                    
+                    ${generateMoleCharts(data)}
                 </div>
                 
                 <div class="results-table">
@@ -126,8 +126,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // Insérer le HTML dans le conteneur
     resultContainer.innerHTML = resultsHTML;
 
-    // Créer le graphique avec Chart.js
+    // Créer le graphique principal avec Chart.js
     createChart(data.chart_data);
+
+    // Créer les graphiques pour chaque grain de beauté détecté
+    if (data.all_detections && data.all_detections.length > 1) {
+      data.all_detections.forEach((mole, index) => {
+        if (mole.chart_data) {
+          createMoleChart(mole.chart_data, `mole-chart-${index}`);
+        }
+      });
+    }
   }
 
   function displayError() {
@@ -139,6 +148,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 <a href="/" class="btn btn-primary"><i class="fas fa-home"></i> Retour à l'accueil</a>
             </div>
         `;
+  }
+
+  function generateMoleCharts(data) {
+    // Vérifier si nous avons des détections multiples
+    if (!data.all_detections || data.all_detections.length <= 1) {
+      return ""; // Retourner une chaîne vide si aucune détection multiple
+    }
+
+    let chartsHTML = "";
+
+    // Générer un conteneur de graphique pour chaque grain de beauté détecté
+    data.all_detections.forEach((mole, index) => {
+      if (mole.chart_data) {
+        // Ajouter un en-tête et un graphique pour chaque grain de beauté
+        chartsHTML += `
+          <div class="mole-chart-section">
+            <h4 class="mole-chart-title">
+              <div class="mole-number-indicator">${index + 1}</div> 
+              Grain de beauté #${index + 1} - ${mole.class_full_name} (${
+          mole.class_name
+        })
+            </h4>
+            <div class="chart-container">
+              <canvas id="mole-chart-${index}"></canvas>
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    return chartsHTML;
   }
 
   function generateMoleDetectionSection(data) {
@@ -158,6 +198,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Calculer la classe de badge pour le niveau de risque
       const riskBadgeClass = getRiskBadgeClass(mole.class_risk);
+
+      // Identifiant unique pour le graphique de ce grain de beauté
+      const chartId = `mole-chart-${index}`;
 
       molesHTML += `
             <div class="mole-card ${borderClass}">
@@ -209,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <div class="moles-info-note">
                 <i class="fas fa-info-circle"></i>
-                <p>Le grain de beauté au risque le plus élevé est mis en évidence avec une bordure rouge.</p>
+                <p>Le grain de beauté au risque le plus élevé est mis en évidence avec une bordure rouge. Chaque grain de beauté dispose de son propre graphique de probabilités.</p>
             </div>
         </div>
         `;
@@ -271,6 +314,87 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function createChart(data) {
     const ctx = document.getElementById("results-chart");
+    if (!ctx) return;
+
+    // Préparer les couleurs
+    const backgroundColors = data.labels.map((_, i) =>
+      i === data.predicted_index ? "#4361ee" : "#e9ecef"
+    );
+
+    const borderColors = data.labels.map((_, i) =>
+      i === data.predicted_index ? "#3a56d4" : "#dee2e6"
+    );
+
+    // Créer le graphique
+    const chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: data.labels,
+        datasets: [
+          {
+            label: "Probabilité (%)",
+            data: data.values.map((v) => v * 100),
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: "Probabilité (%)",
+            },
+            ticks: {
+              callback: function (value) {
+                return value + "%";
+              },
+            },
+            grid: {
+              drawBorder: false,
+            },
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Types de lésions",
+            },
+            grid: {
+              display: false,
+              drawBorder: false,
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return (
+                  context.dataset.label +
+                  ": " +
+                  context.parsed.y.toFixed(1) +
+                  "%"
+                );
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // Fonction pour créer un graphique pour un grain de beauté spécifique
+  function createMoleChart(data, chartId) {
+    const ctx = document.getElementById(chartId);
     if (!ctx) return;
 
     // Préparer les couleurs
