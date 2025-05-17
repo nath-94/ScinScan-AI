@@ -154,8 +154,8 @@ la peau{% endblock %} {% block extra_css %}
         .getContext("2d")
         .drawImage(video, 0, 0, canvas.width, canvas.height);
       canvas.toBlob(function (blob) {
-        const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
-        const dataTransfer = new DataTransfer();
+        const uniqueName = `photo_${Date.now()}.jpg`;      // <- horodatage
+        const file = new File([blob], uniqueName, { type: "image/jpeg" });        const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
         fileInput.files = dataTransfer.files;
 
@@ -463,7 +463,7 @@ la peau{% endblock %} {% block extra_css %}
           }
           <a href="https://www.google.com/maps/search/${encodeURIComponent(
             `${nom} ${adresse} ${ville}`
-          )}" target="_blank" class="btn btn-sm btn-primary">Itinéraire</a>
+          )}" target="_blank" style="color: white "class="btn btn-sm btn-primary">Itinéraire</a>
         </div>
       `;
 
