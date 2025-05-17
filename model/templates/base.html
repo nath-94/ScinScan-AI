@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS commun -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- Feuilles de style Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Script Leaflet -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -28,6 +33,7 @@
                     <ul>
                         <li><a href="/" class="active">Accueil</a></li>
                         <li><a href="#lesions">Types de lésions</a></li>
+                        <li><a href="#map-section">Carte</a></li>
                         <li><a href="#about">À propos</a></li>
                     </ul>
                 </nav>

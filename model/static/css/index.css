@@ -406,6 +406,18 @@
     color: var(--gray-700);
 }
 
+.map-controls{
+  display:flex;         
+  justify-content:center;
+  gap:0.5rem;  
+  margin-bottom: 25px;        
+}
+
+.map-controls .city-input{
+  flex:0 1 250px;    
+}
+
+
 /* Responsive */
 @media (max-width: 768px) {
     .hero h1 {
