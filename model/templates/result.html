@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% block title %}Résultats d'analyse | SkinScan-AI{%
+endblock %} {% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/result.css') }}"
+/>
+{% endblock %} {% block content %}
+<section class="result-hero">
+  <div class="container">
+    <div class="result-header">
+      <h1>Résultats de l'analyse</h1>
+      <p>Évaluation détaillée de la lésion cutanée</p>
+    </div>
+  </div>
+</section>
+
+<section class="result-details">
+  <div class="container">
+    <div id="result-container" class="result-container">
+      <!-- Contenu chargé dynamiquement par JavaScript -->
+      <div class="loading">
+        <div class="spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <p>Chargement des résultats...</p>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <a href="/" class="btn btn-primary">
+        <i class="fas fa-home"></i> Retour à l'accueil
+      </a>
+      <a href="/" class="btn btn-secondary">
+        <i class="fas fa-redo"></i> Nouvelle analyse
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
+<script src="{{ url_for('static', filename='js/image-loader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}
