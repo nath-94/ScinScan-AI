@@ -427,7 +427,7 @@ def draw_bounding_boxes(img_path, detections, save_path=None):
     annotated_img = image.copy()
     
     # Définir les couleurs (BGR)
-    box_color = (0, 165, 255)  # Orange
+    box_color = (0, 255, 0)  # Green
     text_color = (255, 255, 255)  # Blanc
     high_risk_box_color = (0, 0, 255)  # Rouge pour les grains à risque élevé
     

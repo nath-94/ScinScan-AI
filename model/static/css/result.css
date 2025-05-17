@@ -21,11 +21,85 @@
 
 .results-wrapper {
   max-width: 960px;
+  width: 100%;
   margin: 0 auto;
   padding: var(--spacing-lg);
 }
 .chart-container {
   height: 300px;
+  width: 100%;
+}
+
+.results-chart {
+  margin-bottom: var(--spacing-lg);
+}
+
+.results-table {
+  margin-bottom: var(--spacing-lg);
+  overflow-x: auto;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.results-table-data {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table-data th,
+.results-table-data td {
+  padding: var(--spacing-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--color-gray-200);
+  white-space: nowrap;
+}
+
+.results-table-data th:first-child,
+.results-table-data td:first-child {
+  padding-left: var(--spacing-md);
+}
+
+.results-table-data th:last-child,
+.results-table-data td:last-child {
+  padding-right: var(--spacing-md);
+}
+
+/* Ajout des couleurs alternées pour les lignes */
+.results-table-data tbody tr:nth-child(even) {
+  background-color: var(--color-gray-50);
+}
+
+.results-table-data tbody tr.highlighted-row {
+  background-color: rgba(67, 97, 238, 0.1);
+}
+
+.progress-bar-container {
+  width: 100%;
+  min-width: 100px;
+  max-width: 200px;
+  background-color: var(--color-gray-100);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  height: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 0.5s ease-in-out;
+}
+
+.progress-primary {
+  background-color: var(--color-primary);
+}
+
+.progress-secondary {
+  background-color: var(--color-gray-300);
 }
 
 .image-container {
@@ -81,22 +155,35 @@
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   max-width: 960px;
+  width: 100%;
   margin: 0 auto;
-  min-height: 500px;
+  min-height: 200px; /* Réduit pour mobile */
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.5rem;
 }
 
 .loading {
   text-align: center;
   padding: var(--spacing-xl);
+  width: 100%;
 }
 
 .loading .spinner {
   font-size: 2rem;
   color: var(--primary-color);
   margin-bottom: var(--spacing-md);
+  animation: spin 1.5s infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .result-actions {
@@ -104,6 +191,14 @@
   justify-content: center;
   gap: var(--spacing-md);
   margin-top: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.result-actions a {
+  flex: 1;
+  min-width: 150px;
+  max-width: 250px;
+  text-align: center;
 }
 
 /* Styles pour la section des grains de beauté détectés */
@@ -270,12 +365,37 @@
   border-top: 1px dashed var(--color-gray-300);
 }
 
+.mole-charts-heading {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 2px solid var(--color-gray-200);
+  color: var(--color-primary);
+  font-size: 1.3rem;
+}
+
 .mole-chart-title {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   font-size: 1rem;
   margin-bottom: var(--spacing-md);
   color: var(--color-primary);
+  gap: var(--spacing-xs);
+}
+
+.mole-chart-name {
+  flex: 1;
+  min-width: 200px;
+}
+
+.mole-chart-short-name {
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+.mole-chart-risk {
+  margin-left: auto;
+  align-self: flex-start;
 }
 
 .mole-number-indicator {
@@ -289,5 +409,175 @@
   justify-content: center;
   font-weight: bold;
   font-size: 0.9rem;
-  margin-right: var(--spacing-sm);
+  margin-right: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+/* Styles responsives pour différentes tailles d'écran */
+@media (max-width: 1024px) {
+  .results-wrapper {
+    padding: var(--spacing-md);
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .result-hero {
+    padding: var(--spacing-lg) 0;
+  }
+
+  .result-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .results-wrapper {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
+
+  .chart-container {
+    height: 220px;
+  }
+
+  .results-table {
+    overflow-x: auto;
+  }
+
+  .mole-chart-section {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+  }
+
+  .result-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: stretch;
+  }
+
+  .result-actions a {
+    text-align: center;
+  }
+
+  /* Amélioration des layout des résultats */
+  .results-image,
+  .results-info {
+    width: 100%;
+  }
+
+  .mole-chart-title {
+    flex-wrap: wrap;
+  }
+
+  .result-body {
+    padding: var(--spacing-sm);
+  }
+
+  .result-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .result-item {
+    width: 100%;
+    margin-bottom: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .result-hero {
+    padding: var(--spacing-md) 0;
+  }
+
+  .result-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .result-header p {
+    font-size: 0.9rem;
+  }
+
+  .results-wrapper {
+    padding: var(--spacing-sm);
+  }
+
+  .chart-container {
+    height: 200px;
+  }
+
+  .result-card {
+    padding: var(--spacing-sm);
+  }
+
+  .result-primary h4 {
+    font-size: 1.1rem;
+  }
+
+  .result-primary p {
+    font-size: 0.85rem;
+  }
+
+  .result-details {
+    font-size: 0.85rem;
+  }
+
+  .result-recommendation {
+    font-size: 0.85rem;
+    padding: var(--spacing-sm);
+  }
+
+  .moles-detection-section {
+    padding: var(--spacing-sm);
+  }
+
+  .moles-detection-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .mole-chart-title {
+    font-size: 0.9rem;
+  }
+
+  .results-table-data thead th {
+    font-size: 0.85rem;
+    padding: var(--spacing-xs);
+  }
+
+  .results-table-data tbody td {
+    font-size: 0.8rem;
+    padding: var(--spacing-xs);
+  }
+
+  .results-disclaimer {
+    font-size: 0.8rem;
+    padding: var(--spacing-sm);
+  }
+
+  /* Amélioration supplémentaires pour très petits écrans */
+  .mole-number-indicator {
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+  }
+
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Optimiser le layout des graphiques */
+  .results-chart h3,
+  .results-table h3,
+  .moles-detection-section h3 {
+    font-size: 1rem;
+  }
+
+  /* Améliorer la lisibilité des graphiques */
+  .mole-chart-section {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-gray-300);
+  }
 }

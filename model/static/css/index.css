@@ -377,7 +377,7 @@
 
 /* About section */
 .about-section {
-  background-color: white;
+  background-color: var(--gray-100);
 }
 
 .about-content {
@@ -432,7 +432,7 @@
 
 /* Styles pour la section carte */
 .map-section {
-  background-color: var(--gray-100);
+  background-color: white;
   padding-bottom: var(--spacing-xxl);
 }
 
