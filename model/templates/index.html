@@ -1,211 +1,267 @@
-{% extends "base.html" %}
-
-{% block title %}SkinScan-AI | Détection de cancer de la peau{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% extends "base.html" %} {% block title %}SkinScan-AI | Détection de cancer de
+la peau{% endblock %} {% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/index.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/index.css') }}"
+/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <section class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <h1>Détection de cancer de la peau par Intelligence Artificielle</h1>
-            <p>SkinScan-AI analyse les images de lésions cutanées et aide à identifier les signes potentiels de cancer de la peau.</p>
-            <a href="#upload" class="btn btn-primary">Commencer l'analyse</a>
-        </div>
+  <div class="container">
+    <div class="hero-content">
+      <h1>Détection de cancer de la peau par Intelligence Artificielle</h1>
+      <p>
+        SkinScan-AI analyse les images de lésions cutanées et aide à identifier
+        les signes potentiels de cancer de la peau.
+      </p>
+      <a href="#upload" class="btn btn-primary">Commencer l'analyse</a>
     </div>
+  </div>
 </section>
 
 <section id="upload" class="upload-section">
-    <div class="container">
-        <div class="section-header">
-            <h2>Analyser une lésion cutanée</h2>
-            <p>Téléchargez une photo claire de la lésion pour obtenir une évaluation par notre IA</p>
-        </div>
-        
-        <div class="upload-container">
-            <div id="upload-area" class="upload-area">
-                <div class="upload-content">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <h3>Déposez votre image ici</h3>
-                    <p>ou</p>
-                   <label for="file-input" class="btn btn-secondary">Parcourir</label>
-                    <input type="file" id="file-input" accept=".jpg,.jpeg,.png" capture="environment" hidden>
-                    <button id="open-camera-btn" class="btn btn-secondary" type="button">Prendre une photo</button>
-                    <h3>Déposez votre image ici</h3>
-                    <p>ou</p>
-
-                    <p class="file-info" id="file-info">Aucun fichier sélectionné</p>
-                </div>
-                <div class="upload-preview" id="upload-preview">
-                    <img id="preview-image" src="" alt="Aperçu">
-                    <button id="remove-image" class="btn-remove"><i class="fas fa-times"></i></button>
-                </div>
-            </div>
-            
-            <div class="upload-actions">
-                <button id="analyze-btn" class="btn btn-primary btn-analyze" disabled>
-                    <i class="fas fa-search"></i> Analyser l'image
-                </button>
-            </div>
-            
-            <div id="upload-status" class="upload-status">
-                <div class="spinner" id="spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                </div>
-                <div class="status-message" id="status-message"></div>
-            </div>
-        </div>
-
-        <!-- Modale webcam -->
-        <div id="camera-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#fff; padding:20px; border-radius:8px; text-align:center;">
-            <video id="video" width="320" height="240" autoplay></video>
-            <br>
-            <button id="take-photo-btn" class="btn btn-primary" type="button">Capturer</button>
-            <button id="close-camera-btn" class="btn btn-secondary" type="button">Fermer</button>
-            <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
-        </div>
-        </div>
+  <div class="container">
+    <div class="section-header">
+      <h2>Analyser une lésion cutanée</h2>
+      <p>
+        Téléchargez une photo claire de la lésion pour obtenir une évaluation
+        par notre IA
+      </p>
     </div>
+
+    <div class="upload-container">
+      <div id="upload-area" class="upload-area">
+        <div class="upload-content">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h3>Déposez votre image ici</h3>
+          <p>ou</p>
+          <label for="file-input" class="btn btn-secondary">Parcourir</label>
+          <input
+            type="file"
+            id="file-input"
+            accept=".jpg,.jpeg,.png"
+            capture="environment"
+            hidden
+          />
+          <button id="open-camera-btn" class="btn btn-secondary" type="button">
+            Prendre une photo
+          </button>
+          <h3>Déposez votre image ici</h3>
+          <p>ou</p>
+
+          <p class="file-info" id="file-info">Aucun fichier sélectionné</p>
+        </div>
+        <div class="upload-preview" id="upload-preview">
+          <img id="preview-image" src="" alt="Aperçu" />
+          <button id="remove-image" class="btn-remove">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="upload-actions">
+        <button id="analyze-btn" class="btn btn-primary btn-analyze" disabled>
+          <i class="fas fa-search"></i> Analyser l'image
+        </button>
+      </div>
+
+      <div id="upload-status" class="upload-status">
+        <div class="spinner" id="spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div class="status-message" id="status-message"></div>
+      </div>
+    </div>
+
+    <!-- Modale webcam -->
+    <div
+      id="camera-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+        "
+      >
+        <video id="video" width="320" height="240" autoplay></video>
+        <br />
+        <button id="take-photo-btn" class="btn btn-primary" type="button">
+          Capturer
+        </button>
+        <button id="close-camera-btn" class="btn btn-secondary" type="button">
+          Fermer
+        </button>
+        <canvas
+          id="canvas"
+          width="320"
+          height="240"
+          style="display: none"
+        ></canvas>
+      </div>
+    </div>
+  </div>
 </section>
-<script>const openCameraBtn = document.getElementById('open-camera-btn');
-const cameraModal = document.getElementById('camera-modal');
-const video = document.getElementById('video');
-const takePhotoBtn = document.getElementById('take-photo-btn');
-const closeCameraBtn = document.getElementById('close-camera-btn');
-const canvas = document.getElementById('canvas');
-const fileInput = document.getElementById('file-input');
-const previewImage = document.getElementById('preview-image');
+<script>
+  const openCameraBtn = document.getElementById("open-camera-btn");
+  const cameraModal = document.getElementById("camera-modal");
+  const video = document.getElementById("video");
+  const takePhotoBtn = document.getElementById("take-photo-btn");
+  const closeCameraBtn = document.getElementById("close-camera-btn");
+  const canvas = document.getElementById("canvas");
+  const fileInput = document.getElementById("file-input");
+  const previewImage = document.getElementById("preview-image");
 
-let stream = null;
+  let stream = null;
 
-if (openCameraBtn) {
-  openCameraBtn.onclick = async function() {
-    cameraModal.style.display = 'flex';
-    stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-  };
-}
+  if (openCameraBtn) {
+    openCameraBtn.onclick = async function () {
+      cameraModal.style.display = "flex";
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+    };
+  }
 
-if (closeCameraBtn) {
-  closeCameraBtn.onclick = function() {
-    cameraModal.style.display = 'none';
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
-  };
-}
-
-if (takePhotoBtn) {
-  takePhotoBtn.onclick = function() {
-    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob(function(blob) {
-
-        const file = new File([blob], "photo.jpg", {type: "image/jpeg"});
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      fileInput.files = dataTransfer.files;
-
-      const url = URL.createObjectURL(blob);
-      if (previewImage) previewImage.src = url;
-
-      cameraModal.style.display = 'none';
+  if (closeCameraBtn) {
+    closeCameraBtn.onclick = function () {
+      cameraModal.style.display = "none";
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       }
-      fileInput.dispatchEvent(new Event('change'));
-    }, 'image/jpeg');
-  };
-}</script>
+    };
+  }
+
+  if (takePhotoBtn) {
+    takePhotoBtn.onclick = function () {
+      canvas
+        .getContext("2d")
+        .drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(function (blob) {
+        const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+
+        const url = URL.createObjectURL(blob);
+        if (previewImage) previewImage.src = url;
+
+        cameraModal.style.display = "none";
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+        fileInput.dispatchEvent(new Event("change"));
+      }, "image/jpeg");
+    };
+  }
+</script>
 
 <section id="results-section" class="results-section hidden">
-    <div class="container">
-        <div class="section-header">
-            <h2>Résultats de l'analyse</h2>
-            <p>Évaluation préliminaire basée sur l'apprentissage automatique</p>
-        </div>
-        
-        <div class="results-container">
-            <div class="results-image">
-                <img id="result-image" src="" alt="Lésion analysée">
-            </div>
-            
-            <div class="results-info">
-                <div class="result-card">
-                    <div class="result-header">
-                        <h3>Diagnostic préliminaire</h3>
-                    </div>
-                    <div class="result-body">
-                        <div class="result-primary">
-                            <h4 id="result-class-name"></h4>
-                            <p id="result-class-description"></p>
-                        </div>
-                        
-                        <div class="result-details">
-                            <div class="result-item">
-                                <div class="result-label">Niveau de risque:</div>
-                                <div class="result-value">
-                                    <span id="result-risk" class="badge"></span>
-                                </div>
-                            </div>
-                            <div class="result-item">
-                                <div class="result-label">Confiance:</div>
-                                <div class="result-value" id="result-confidence"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="result-recommendation" id="result-recommendation"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="results-chart">
-                <h3>Probabilités par type de lésion</h3>
-                <div class="chart-container">
-                    <canvas id="results-chart"></canvas>
-                </div>
-            </div>
-            
-            <div class="results-disclaimer">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Ce résultat est fourni à titre informatif uniquement et ne constitue pas un diagnostic médical. 
-                   Consultez un dermatologue pour une évaluation professionnelle.</p>
-            </div>
-            
-            <div class="results-actions">
-                <button id="new-analysis-btn" class="btn btn-primary">
-                    <i class="fas fa-redo"></i> Nouvelle analyse
-                </button>
-            </div>
-        </div>
+  <div class="container">
+    <div class="section-header">
+      <h2>Résultats de l'analyse</h2>
+      <p>Évaluation préliminaire basée sur l'apprentissage automatique</p>
     </div>
+
+    <div class="results-container">
+      <div class="results-image">
+        <img id="result-image" src="" alt="Lésion analysée" />
+      </div>
+
+      <div class="results-info">
+        <div class="result-card">
+          <div class="result-header">
+            <h3>Diagnostic préliminaire</h3>
+          </div>
+          <div class="result-body">
+            <div class="result-primary">
+              <h4 id="result-class-name"></h4>
+              <p id="result-class-description"></p>
+            </div>
+
+            <div class="result-details">
+              <div class="result-item">
+                <div class="result-label">Niveau de risque:</div>
+                <div class="result-value">
+                  <span id="result-risk" class="badge"></span>
+                </div>
+              </div>
+              <div class="result-item">
+                <div class="result-label">Confiance:</div>
+                <div class="result-value" id="result-confidence"></div>
+              </div>
+            </div>
+
+            <div class="result-recommendation" id="result-recommendation"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-chart">
+        <h3>Probabilités par type de lésion</h3>
+        <div class="chart-container">
+          <canvas id="results-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="results-disclaimer">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>
+          Ce résultat est fourni à titre informatif uniquement et ne constitue
+          pas un diagnostic médical. Consultez un dermatologue pour une
+          évaluation professionnelle.
+        </p>
+      </div>
+
+      <div class="results-actions">
+        <button id="new-analysis-btn" class="btn btn-primary">
+          <i class="fas fa-redo"></i> Nouvelle analyse
+        </button>
+        <button id="view-details-btn" class="btn btn-secondary">
+          <i class="fas fa-search-plus"></i> Voir les détails
+        </button>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="lesions" class="lesions-section">
-    <div class="container">
-        <div class="section-header">
-            <h2>Types de lésions détectées</h2>
-            <p>Notre système peut identifier ces 7 types de lésions cutanées</p>
-        </div>
-        
-        <div class="lesions-grid">
-            {% for code in class_names %}
-            <div class="lesion-card">
-                <div class="lesion-icon">
-                    <i class="fas fa-circle"></i>
-                </div>
-                <div class="lesion-info">
-                    <h3>{{ class_full_names[code] }} ({{ code }})</h3>
-                    <p>{{ class_descriptions[code] }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+  <div class="container">
+    <div class="section-header">
+      <h2>Types de lésions détectées</h2>
+      <p>Notre système peut identifier ces 7 types de lésions cutanées</p>
     </div>
+
+    <div class="lesions-grid">
+      {% for code in class_names %}
+      <div class="lesion-card">
+        <div class="lesion-icon">
+          <i class="fas fa-circle"></i>
+        </div>
+        <div class="lesion-info">
+          <h3>{{ class_full_names[code] }} ({{ code }})</h3>
+          <p>{{ class_descriptions[code] }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </section>
 
 <section id="map-section" class="map-section">
@@ -215,104 +271,344 @@ if (takePhotoBtn) {
       <p>Recherchez une ville pour localiser les dermatologues sur la carte</p>
     </div>
 
-    <div class="map-controls">
-      <input id="cityInput" type="text" placeholder="Entrez une ville…" class="city-input">
-      <button id="goBtn" class="btn btn-primary">OK</button>
-    </div>
+    <div class="map-ui-container">
+      <div class="map-search-panel">
+        <div class="map-search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            id="cityInput"
+            type="text"
+            placeholder="Rechercher une ville ou un code postal..."
+            class="city-input"
+            autocomplete="off"
+          />
+          <button id="goBtn" class="btn btn-primary">Rechercher</button>
+        </div>
 
-    <div id="map" style="height: 500px;"></div>
+        <div class="map-filters">
+          <div class="filter-label">Filtres :</div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" id="filterSecteur1" checked /> Secteur 1
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filterSecteur2" checked /> Secteur 2
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filterCartevitale" checked /> Carte
+              Vitale
+            </label>
+          </div>
+        </div>
+
+        <div class="search-results" id="searchResults">
+          <!-- Les résultats de recherche seront affichés ici -->
+        </div>
+      </div>
+
+      <div class="map-container">
+        <div id="map"></div>
+        <div class="map-legend">
+          <div class="legend-item">
+            <span class="legend-marker secteur1"></span>
+            <span>Secteur 1</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker secteur2"></span>
+            <span>Secteur 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
-
 
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  const map = L.map('map').setView([46.5, 2.5], 6);
+  // Création de la carte avec un style personnalisé
+  const map = L.map("map", {
+    zoomControl: false,
+    scrollWheelZoom: true,
+  }).setView([46.5, 2.5], 6);
 
-  // Fond de carte
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-  }).addTo(map);
+  // Ajout du contrôle de zoom dans le coin en bas à droite
+  L.control
+    .zoom({
+      position: "bottomright",
+    })
+    .addTo(map);
 
-  // Charger ton GeoJSON
-  fetch("{{ url_for('static', filename='data/annuaire.geojson') }}")
-    .then(res => res.json())
-    .then(data => {
-      L.geoJSON(data, {
-        onEachFeature: (feature, layer) => {
-          const props = feature.properties;
-          const nom = props["nom"] || "Inconnu";
-          const adresse = props["adresse"] || "";
-          const ville = props["dep_name"] || "";
-          const cp = props["Code code_commune"] || "";
-          layer.bindPopup(`<strong>${nom}</strong><br>${adresse}<br>${cp} ${ville}`);
-        }
-      }).addTo(map);
+  // Utilisation d'un fond de carte amélioré
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: "abcd",
+      maxZoom: 19,
+    }
+  ).addTo(map);
+
+  // Personnalisation des marqueurs
+  const createCustomIcon = (secteur) => {
+    return L.divIcon({
+      className: `custom-marker secteur${secteur}`,
+      html: '<i class="fas fa-user-md"></i>',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
     });
+  };
+
+  // Variable pour stocker les médecins
+  let allDoctors = [];
+  let markersLayer = L.layerGroup().addTo(map);
+
+  // Charger le GeoJSON
+  fetch("{{ url_for('static', filename='data/annuaire.geojson') }}")
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`Erreur HTTP: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      if (data && data.features && Array.isArray(data.features)) {
+        allDoctors = data.features.filter(
+          (doctor) =>
+            doctor &&
+            doctor.geometry &&
+            Array.isArray(doctor.geometry.coordinates)
+        );
+        console.log(`${allDoctors.length} dermatologues chargés avec succès`);
+      } else {
+        allDoctors = [];
+        console.error("Format de données GeoJSON invalide");
+      }
+      displayDoctors();
+    })
+    .catch((error) => {
+      console.error("Erreur de chargement des données:", error);
+      const resultsContainer = document.getElementById("searchResults");
+      resultsContainer.innerHTML = `<div class="search-error">
+        <i class="fas fa-exclamation-circle"></i>
+        Impossible de charger la liste des médecins.
+      </div>`;
+    });
+
+  // Affichage des médecins sur la carte
+  function displayDoctors() {
+    // Effacer les marqueurs existants
+    markersLayer.clearLayers();
+
+    // Récupérer les filtres
+    const showSecteur1 = document.getElementById("filterSecteur1").checked;
+    const showSecteur2 = document.getElementById("filterSecteur2").checked;
+    const showCarteVitale =
+      document.getElementById("filterCartevitale").checked;
+
+    // Afficher les résultats
+    const resultsContainer = document.getElementById("searchResults");
+    resultsContainer.innerHTML = "";
+
+    let visibleDoctors = 0;
+
+    allDoctors.forEach((doctor) => {
+      // Vérifier que doctor et doctor.geometry existent
+      if (!doctor || !doctor.geometry || !doctor.geometry.coordinates) {
+        console.warn("Médecin sans coordonnées géographiques trouvé:", doctor);
+        return;
+      }
+
+      const props = doctor.properties;
+      const nom = props["nom"] || "Inconnu";
+      const adresse = props["adresse"] || "";
+      const ville = props["dep_name"] || "";
+      const cp = props["Code code_commune"] || "";
+      const specialite = props["libelle_profession"] || "Dermatologue";
+      const secteur =
+        props["convention"] === "Secteur 2, Pas de contrat d'accès aux soins"
+          ? 2
+          : 1; // Secteur par défaut
+      const carteVitale =
+        props["sesam_vitale"] == "Lecteur de carte Sesam Vitale" ? true : false; // Par défaut true
+
+      // Appliquer les filtres
+      if ((secteur === 1 && !showSecteur1) || (secteur === 2 && !showSecteur2))
+        return;
+      if (showCarteVitale && !carteVitale) return;
+
+      visibleDoctors++;
+
+      // Créer le marqueur avec l'icône personnalisée selon le secteur
+      const marker = L.marker(
+        [doctor.geometry.coordinates[1], doctor.geometry.coordinates[0]],
+        {
+          icon: createCustomIcon(secteur),
+        }
+      );
+
+      // Créer une popup personnalisée
+      const popupContent = `
+        <div class="doctor-popup">
+          <h3>${nom}</h3>
+          <p><i class="fas fa-stethoscope"></i> ${specialite}</p>
+          <p><i class="fas fa-map-marker-alt"></i> ${adresse}</p>
+          <p><i class="fas fa-city"></i> ${cp} ${ville}</p>
+          <p><i class="fas fa-money-bill-wave"></i> Secteur ${secteur}</p>
+          ${
+            carteVitale
+              ? '<p><i class="fas fa-credit-card"></i> Carte Vitale acceptée</p>'
+              : ""
+          }
+          <a href="https://www.google.com/maps/search/${encodeURIComponent(
+            `${nom} ${adresse} ${ville}`
+          )}" target="_blank" class="btn btn-sm btn-primary">Itinéraire</a>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent);
+      markersLayer.addLayer(marker);
+
+      // Ajouter au panel de résultats s'il y en a 10 ou moins
+      if (visibleDoctors <= 10) {
+        const doctorCard = document.createElement("div");
+        doctorCard.className = "search-result-item";
+        doctorCard.innerHTML = `
+          <h4>${nom}</h4>
+          <p>${specialite} - Secteur ${secteur}</p>
+          <p>${adresse}, ${cp} ${ville}</p>
+        `;
+        doctorCard.addEventListener("click", () => {
+          // On sait déjà que les coordonnées existent car on a filtré plus haut
+          map.setView(
+            [doctor.geometry.coordinates[1], doctor.geometry.coordinates[0]],
+            15
+          );
+          marker.openPopup();
+        });
+        resultsContainer.appendChild(doctorCard);
+      }
+    });
+
+    // Mettre à jour le nombre total
+    if (visibleDoctors > 10) {
+      const countInfo = document.createElement("div");
+      countInfo.className = "results-count";
+      countInfo.textContent = `${visibleDoctors} dermatologues trouvés. Affinez votre recherche pour de meilleurs résultats.`;
+      resultsContainer.appendChild(countInfo);
+    }
+  }
+
+  // Gestion des filtres
+  document
+    .getElementById("filterSecteur1")
+    .addEventListener("change", displayDoctors);
+  document
+    .getElementById("filterSecteur2")
+    .addEventListener("change", displayDoctors);
+  document
+    .getElementById("filterCartevitale")
+    .addEventListener("change", displayDoctors);
 
   // Géocodage avec Nominatim
   async function geocode(city) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`;
-    const [res] = await fetch(url, { headers:{'User-Agent':'derm-app'} }).then(r => r.json());
-    if (!res) throw "Ville introuvable";
-    return { lat: parseFloat(res.lat), lon: parseFloat(res.lon) };
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(
+      city
+    )}`;
+    try {
+      const response = await fetch(url, {
+        headers: { "User-Agent": "SkinScan-AI" },
+      });
+      const data = await response.json();
+      if (data.length === 0) throw "Ville introuvable";
+      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    } catch (e) {
+      throw "Erreur de recherche: " + e;
+    }
   }
 
-  document.getElementById('goBtn').addEventListener('click', async () => {
-    const city = document.getElementById('cityInput').value.trim();
+  // Gestion de la recherche
+  document.getElementById("goBtn").addEventListener("click", searchLocation);
+  document.getElementById("cityInput").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") searchLocation();
+  });
+
+  async function searchLocation() {
+    const city = document.getElementById("cityInput").value.trim();
     if (!city) return;
+
     try {
+      // Afficher l'indicateur de chargement
+      document.getElementById("goBtn").innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i>';
+      document.getElementById("goBtn").disabled = true;
+
       const coords = await geocode(city);
       map.setView([coords.lat, coords.lon], 13);
+
+      // Restaurer le bouton
+      document.getElementById("goBtn").innerHTML = "Rechercher";
+      document.getElementById("goBtn").disabled = false;
     } catch (e) {
-      alert(e);
+      // Gérer l'erreur
+      document.getElementById("goBtn").innerHTML = "Rechercher";
+      document.getElementById("goBtn").disabled = false;
+
+      const resultsContainer = document.getElementById("searchResults");
+      resultsContainer.innerHTML = `<div class="search-error"><i class="fas fa-exclamation-circle"></i> ${e}</div>`;
     }
-  });
+  }
 </script>
 
-
 <section id="about" class="about-section">
-    <div class="container">
-        <div class="section-header">
-            <h2>À propos de SkinScan-AI</h2>
-            <p>Notre mission et notre technologie</p>
-        </div>
-        
-        <div class="about-content">
-            <div class="about-text">
-                <h3>Notre mission</h3>
-                <p>SkinScan-AI a été développé pour aider à la détection précoce du cancer de la peau, 
-                   en fournissant un outil d'aide à la décision basé sur l'intelligence artificielle.</p>
-                
-                <h3>Notre technologie</h3>
-                <p>Nous utilisons un réseau neuronal convolutif entraîné sur le jeu de données HAM10000, 
-                   qui contient plus de 10 000 images de lésions cutanées diagnostiquées cliniquement.</p>
-                
-                <h3>Limites</h3>
-                <p>Ce système a une précision limitée et ne remplace pas l'expertise d'un dermatologue. 
-                   Il doit être utilisé comme un outil complémentaire et non comme un substitut à un avis médical.</p>
-            </div>
-            
-            <div class="about-stats">
-                <div class="stat-item">
-                    <div class="stat-value">73%</div>
-                    <div class="stat-label">Précision globale</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">7</div>
-                    <div class="stat-label">Types de lésions</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">10k+</div>
-                    <div class="stat-label">Images d'entraînement</div>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div class="section-header">
+      <h2>À propos de SkinScan-AI</h2>
+      <p>Notre mission et notre technologie</p>
     </div>
-</section>
-{% endblock %}
 
-{% block extra_js %}
+    <div class="about-content">
+      <div class="about-text">
+        <h3>Notre mission</h3>
+        <p>
+          SkinScan-AI a été développé pour aider à la détection précoce du
+          cancer de la peau, en fournissant un outil d'aide à la décision basé
+          sur l'intelligence artificielle.
+        </p>
+
+        <h3>Notre technologie</h3>
+        <p>
+          Nous utilisons un réseau neuronal convolutif entraîné sur le jeu de
+          données HAM10000, qui contient plus de 10 000 images de lésions
+          cutanées diagnostiquées cliniquement.
+        </p>
+
+        <h3>Limites</h3>
+        <p>
+          Ce système a une précision limitée et ne remplace pas l'expertise d'un
+          dermatologue. Il doit être utilisé comme un outil complémentaire et
+          non comme un substitut à un avis médical.
+        </p>
+      </div>
+
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-value">73%</div>
+          <div class="stat-label">Précision globale</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">7</div>
+          <div class="stat-label">Types de lésions</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">10k+</div>
+          <div class="stat-label">Images d'entraînement</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

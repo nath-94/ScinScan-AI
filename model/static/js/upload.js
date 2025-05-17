@@ -173,31 +173,81 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     };
 
-    // Mettre à jour les informations du diagnostic
-    resultClassName.textContent =
-      data.class_full_name + " (" + data.class_name + ")";
-    resultClassDescription.textContent = data.class_description;
+    // Vérifier si l'image contient des grains de beauté à risque élevé
+    const hasHighRisk = data.has_high_risk;
+    const hasMultipleMoles = data.analyzed_moles > 1;
 
-    // Mettre à jour le niveau de risque avec la bonne classe
-    resultRisk.textContent = data.class_risk;
-    resultRisk.className = "badge";
+    // Si risque élevé détecté et plusieurs grains de beauté, afficher uniquement la recommandation
+    if (hasMultipleMoles) {
+      // Cacher les éléments de diagnostic détaillé
+      document.querySelector(".result-primary").style.display = "none";
+      document.querySelector(".result-details").style.display = "none";
+      document.querySelector(".results-chart").style.display = "none";
 
-    if (data.class_risk.includes("Très faible")) {
-      resultRisk.classList.add("badge-success");
-    } else if (data.class_risk.includes("Modéré")) {
-      resultRisk.classList.add("badge-warning");
+      // Mettre en évidence la recommandation
+      if (hasHighRisk) {
+        resultRecommendation.innerHTML =
+          "<strong>ATTENTION:</strong> Un ou plusieurs grains de beauté présentent un risque élevé. \n" +
+          data.recommendation;
+        resultRecommendation.style.fontSize = "1.2em";
+        resultRecommendation.style.color = "#d9534f";
+      } else {
+        resultRecommendation.innerHTML =
+          "<strong>Recommandation:</strong> " + data.recommendation;
+        resultRecommendation.style.fontSize = "1.2em";
+        resultRecommendation.style.color = "#5bc0de";
+      }
+      // Mettre en évidence le bouton de détails
+      const viewDetailsBtn = document.getElementById("view-details-btn");
+      if (viewDetailsBtn) {
+        viewDetailsBtn.classList.remove("btn-secondary");
+        viewDetailsBtn.classList.add("btn-info");
+        viewDetailsBtn.innerHTML =
+          '<i class="fas fa-search-plus"></i> Voir l\'analyse détaillée';
+      }
     } else {
-      resultRisk.classList.add("badge-danger");
+      // Affichage normal pour un seul grain de beauté ou risque faible
+      document.querySelector(".result-primary").style.display = "block";
+      document.querySelector(".result-details").style.display = "block";
+      document.querySelector(".results-chart").style.display = "block";
+
+      // Mettre à jour les informations du diagnostic
+      resultClassName.textContent =
+        data.class_full_name + " (" + data.class_name + ")";
+      resultClassDescription.textContent = data.class_description;
+
+      // Mettre à jour le niveau de risque avec la bonne classe
+      resultRisk.textContent = data.class_risk;
+      resultRisk.className = "badge";
+
+      if (data.class_risk.includes("Très faible")) {
+        resultRisk.classList.add("badge-success");
+      } else if (data.class_risk.includes("Modéré")) {
+        resultRisk.classList.add("badge-warning");
+      } else {
+        resultRisk.classList.add("badge-danger");
+      }
+
+      // Mettre à jour la confiance
+      resultConfidence.textContent = (data.confidence * 100).toFixed(1) + "%";
+
+      // Mettre à jour la recommandation (format normal)
+      resultRecommendation.textContent = data.recommendation;
+      resultRecommendation.style.fontSize = "";
+      resultRecommendation.style.color = "";
+
+      // Réinitialiser le style du bouton de détails
+      const viewDetailsBtn = document.getElementById("view-details-btn");
+      if (viewDetailsBtn) {
+        viewDetailsBtn.classList.remove("btn-info");
+        viewDetailsBtn.classList.add("btn-secondary");
+        viewDetailsBtn.innerHTML =
+          '<i class="fas fa-search-plus"></i> Voir les détails';
+      }
+
+      // Créer ou mettre à jour le graphique
+      createChart(data.chart_data);
     }
-
-    // Mettre à jour la confiance
-    resultConfidence.textContent = (data.confidence * 100).toFixed(1) + "%";
-
-    // Mettre à jour la recommandation
-    resultRecommendation.textContent = data.recommendation;
-
-    // Créer ou mettre à jour le graphique
-    createChart(data.chart_data);
 
     // Afficher la section des résultats
     resultsSection.classList.remove("hidden");
