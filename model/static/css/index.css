@@ -97,6 +97,90 @@
   margin-bottom: var(--spacing-md);
   color: var(--gray-600);
 }
+#diagnostic-modal {
+  position: fixed;
+  inset: 0;                
+  display: none;            
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
+/* Ajoutez ces styles pour la modal-content */
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  position: relative;
+  margin: auto;
+  padding: 20px;
+  transform: translateY(20%); /* Ajustez cette valeur pour le positionnement vertical */
+}
+
+.modal-header {
+  margin-bottom: 20px;
+}
+
+.modal-body {
+  margin-bottom: 20px;
+}
+
+#diagnostic-modal.show {
+  display: flex;           
+}
+
+#diagnostic-modal .modal-content{
+  background:#fff;
+  width:70%;
+  max-width:500px;
+  padding:20px;
+  border-radius:8px;
+}
+
+.modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .5rem;
+  margin-top: 20px;
+}
+
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.radio-group, .checkbox-group {
+  display: flex;
+  gap: 15px;
+}
+
+#additional-info-btn {
+  margin-right: 25px;
+}
+
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
 
 .upload-preview {
   display: none;
@@ -721,6 +805,15 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
+  #open-camera-btn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  h2::after {
+    margin-bottom: 8px;
+    margin-top: 5px;
+  }
   /* Responsive pour la carte */
   .map-ui-container {
     flex-direction: column;
