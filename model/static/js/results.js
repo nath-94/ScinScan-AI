@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (resultData && resultData.success) {
     displayResults(resultData);
   } else {
-    displayError();
+    displayError(resultData);
   }
 
   // Fonction de debounce pour limiter les appels fréquents
@@ -106,8 +106,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function displayError() {
-    resultContainer.innerHTML = `
+  function displayError(data) {
+    // Vérifier si on a un cas spécifique d'absence de grains de beauté
+    if (data && data.no_moles_detected) {
+      resultContainer.innerHTML = `
+            <div class="error-message no-moles-detected">
+                <i class="fas fa-search"></i>
+                <h3>Aucun grain de beauté détecté</h3>
+                <p>L'analyse n'a pas pu détecter de grain de beauté sur votre image.</p>
+                <p class="suggestion">Essayez avec une autre photo ou améliorez l'éclairage et le contraste de l'image.</p>
+                <a href="/" class="btn btn-primary"><i class="fas fa-upload"></i> Essayer avec une autre image</a>
+            </div>
+        `;
+    } else {
+      // Erreur générique
+      resultContainer.innerHTML = `
             <div class="error-message">
                 <i class="fas fa-exclamation-circle"></i>
                 <h3>Aucun résultat disponible</h3>
@@ -115,6 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <a href="/" class="btn btn-primary"><i class="fas fa-home"></i> Retour à l'accueil</a>
             </div>
         `;
+    }
   }
 
   function generateMoleCharts(data) {

@@ -140,9 +140,22 @@ document.addEventListener("DOMContentLoaded", function () {
           // Redirection vers la page de résultats (décommentez pour utiliser)
           // window.location.href = '/result';
         } else {
-          // Afficher l'erreur
-          statusMessage.textContent = "Erreur: " + data.error;
-          statusMessage.classList.add("error");
+          // Vérifier si c'est le cas spécifique d'absence de grains de beauté
+          if (data.no_moles_detected) {
+            statusMessage.textContent =
+              "Aucun grain de beauté détecté sur cette image.";
+            statusMessage.classList.add("warning");
+
+            // Stocker ce résultat spécifique pour l'affichage dans la page de résultats
+            localStorage.setItem("skinScanResult", JSON.stringify(data));
+
+            // Redirection vers la page de résultats pour afficher le message approprié
+            window.location.href = "/result";
+          } else {
+            // Afficher l'erreur standard
+            statusMessage.textContent = "Erreur: " + data.error;
+            statusMessage.classList.add("error");
+          }
         }
       })
       .catch((error) => {
