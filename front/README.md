@@ -1,2 +1,0 @@
-# ScinScan-AI
-Documentation Front
