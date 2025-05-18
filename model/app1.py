@@ -41,12 +41,12 @@ if os.path.exists(openai_config_file):
     try:
         with open(openai_config_file, 'r') as f:
             openai_config = json.load(f)
-            openai.api_key = 'sk-3dyPAdIoWHe47LNGMlAgHFfuwvpjroZL3T8u7x9tpYT3BlbkFJ4KfXx3y2NanF9N-c-x3eBNAVCjkwhRzdUhVWXeIkkA'
+            openai.api_key = ''
     except Exception as e:
         print(f"Erreur lors du chargement de la configuration OpenAI: {e}")
-        openai.api_key = 'sk-3dyPAdIoWHe47LNGMlAgHFfuwvpjroZL3T8u7x9tpYT3BlbkFJ4KfXx3y2NanF9N-c-x3eBNAVCjkwhRzdUhVWXeIkkA'
+        openai.api_key = ''
 else:
-    openai.api_key = 'sk-3dyPAdIoWHe47LNGMlAgHFfuwvpjroZL3T8u7x9tpYT3BlbkFJ4KfXx3y2NanF9N-c-x3eBNAVCjkwhRzdUhVWXeIkkA'
+    openai.api_key = ''
 
 # Chemins des dossiers d'uploads
 app.config['UPLOAD_FOLDER'] = config.UPLOADS_DIR
