@@ -1,5 +1,20 @@
+# Environnements et fichiers sensibles
+.env
+.venv/
 skin_cancer_env/
 model/downloaded_model/
-.venv
+
+model/cache/
+
+# Fichiers Python
 __pycache__/
-uploads/
+*.pyc
+*.pyo
+*.pyd
+
+# Dossiers de données ou temporaires
+Uploads/
+
+# Autres fichiers courants
+.DS_Store  # Pour macOS
+*.log
