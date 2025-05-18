@@ -16,5 +16,4 @@ __pycache__/
 Uploads/
 
 # Autres fichiers courants
-.DS_Store  # Pour macOS
-*.log
+.DS_Store  # Pour macOSgit add .gitignore
