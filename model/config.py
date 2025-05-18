@@ -21,7 +21,7 @@ for directory in [TEMPLATES_DIR, STATIC_DIR, UPLOADS_DIR, RESOURCES_DIR, CACHE_D
     os.makedirs(directory, exist_ok=True)
 
 # Configuration de l'API OpenAI
-OPENAI_API_KEY = "votre_clef_api_openai"  # À remplacer par votre clé API
+OPENAI_API_KEY = ""  # À remplacer par votre clé API
 
 # Configuration du modèle de détection de cancer
 HF_MODEL_REPO = "syaha/skin_cancer_detection_model"
