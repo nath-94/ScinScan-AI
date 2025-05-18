@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mention.css') }}">
@@ -8,101 +9,125 @@
 {% block content %}
 <section class="privacy-section">
     <div class="container">
-      <h1>Mentions légales — SkinScan‑AI</h1>
+        <!-- Éléments de design visuel -->
+        <div class="design-element design-element-1"></div>
+        <div class="design-element design-element-2"></div>
+        
+        <h1>Mentions légales — SkinScan‑AI</h1>
+        
+        <!-- Table des matières flottante (visible sur desktop) -->
+        <div class="toc-container">
+            <h3>Sommaire</h3>
+            <ul>
+                <li><a href="#identite-site">Identification du site</a></li>
+                <li><a href="#hebergement">Hébergement</a></li>
+                <li><a href="#statut-projet">Statut du projet</a></li>
+                <li><a href="#propriete-intellectuelle">Propriété intellectuelle</a></li>
+                <li><a href="#responsabilite">Responsabilité</a></li>
+                <li><a href="#donnees-personnelles">Données personnelles</a></li>
+                <li><a href="#vos-droits">Vos droits</a></li>
+                <li><a href="#cookies">Cookies</a></li>
+                <li><a href="#securite">Sécurité</a></li>
+                <li><a href="#droit-applicable">Droit applicable</a></li>
+            </ul>
+        </div>
 
-  <section id="identite-site">
-    <h2>1. Identification du site</h2>
-    <p><strong>Nom du site :</strong> SkinScan‑AI</p>
-    <p><strong>Éditeur :</strong> Projet SkinScan‑AI – Hackathon D4gen</p>
-    <p><strong>Président de l’association / Responsable légal :</strong> Nathan Dedryver</p>
-    <p><strong>Adresse du siège :</strong> Locaux de Onepoint Paris – <em>[adresse complète à ajouter]</em></p>
-    <p><strong>Contact :</strong> <a href="mailto:Nathan.dedryver@eleve.isep.fr">Nathan.dedryver@eleve.isep.fr</a></p>
-  </section>
+        <section id="identite-site">
+            <h2>Identification du site</h2>
+            <p><strong>Nom du site :</strong> SkinScan‑AI</p>
+            <p><strong>Éditeur :</strong> Projet SkinScan‑AI – Hackathon D4gen</p>
+            <p><strong>Président de l'association / Responsable légal :</strong> Nathan Dedryver</p>
+            <p><strong>Adresse du siège :</strong> Locaux de Onepoint Paris – <em>[adresse complète à ajouter]</em></p>
+            <p><strong>Contact :</strong> <a href="mailto:Nathan.dedryver@eleve.isep.fr">Nathan.dedryver@eleve.isep.fr</a></p>
+        </section>
 
-  <section id="hebergement">
-    <h2>2. Hébergement</h2>
-    <p><strong>Hébergeur :</strong> Amazon Web Services (AWS)</p>
-    <address>
-      31 place des Corolles, Tour Carpe Diem,<br />
-      92400 Courbevoie – France
-    </address>
-    <p><strong>Certification :</strong> Hébergeur de Données de Santé (HDS), conforme au RGPD</p>
-    <p><strong>Région serveur utilisée :</strong> eu‑west‑3 (Paris)</p>
-  </section>
+        <section id="hebergement">
+            <h2>Hébergement</h2>
+            <p><strong>Hébergeur :</strong> Amazon Web Services (AWS)</p>
+            <address>
+                31 place des Corolles, Tour Carpe Diem,<br />
+                92400 Courbevoie – France
+            </address>
+            <p><strong>Certification :</strong> Hébergeur de Données de Santé (HDS), conforme au RGPD</p>
+            <p><strong>Région serveur utilisée :</strong> eu‑west‑3 (Paris)</p>
+        </section>
 
-  <section id="statut-projet">
-    <h2>3. Statut du projet</h2>
-    <p>SkinScan‑AI est un outil open source à but non lucratif, développé dans le cadre d’un hackathon. Il ne fournit pas de diagnostic médical et n’est pas un dispositif médical au sens du règlement (UE) 2017/745.</p>
-  </section>
+        <section id="statut-projet">
+            <h2>Statut du projet</h2>
+            <p>SkinScan‑AI est un outil open source à but non lucratif, développé dans le cadre d'un hackathon. Il ne fournit pas de diagnostic médical et n'est pas un dispositif médical au sens du règlement (UE) 2017/745.</p>
+        </section>
 
-  <section id="propriete-intellectuelle">
-    <h2>4. Propriété intellectuelle</h2>
-    <p>L’ensemble du contenu du site (textes, images, modèles IA, interface, design) est la propriété de SkinScan‑AI ou de ses contributeurs open source, sauf mention contraire.</p>
-    <p>Le code source est publié sous licence <em>[MIT / Apache 2.0 – à préciser]</em>, permettant la réutilisation libre sous conditions de mention des auteurs.</p>
-    <p>Toute reproduction totale ou partielle du site sans autorisation est interdite.</p>
-  </section>
+        <section id="propriete-intellectuelle">
+            <h2>Propriété intellectuelle</h2>
+            <p>L'ensemble du contenu du site (textes, images, modèles IA, interface, design) est la propriété de SkinScan‑AI ou de ses contributeurs open source, sauf mention contraire.</p>
+            <p>Le code source est publié sous licence <em>[MIT / Apache 2.0 – à préciser]</em>, permettant la réutilisation libre sous conditions de mention des auteurs.</p>
+            <p>Toute reproduction totale ou partielle du site sans autorisation est interdite.</p>
+        </section>
 
-  <section id="responsabilite">
-    <h2>5. Clause de responsabilité</h2>
-    <p>Les informations fournies par SkinScan‑AI sont données à titre indicatif, informatif et éducatif. Elles ne remplacent en aucun cas un avis médical professionnel.</p>
-    <p>SkinScan‑AI ne saurait être tenu responsable :</p>
-    <ul>
-      <li>d’une mauvaise interprétation des résultats affichés,</li>
-      <li>d’une utilisation détournée ou hors cadre du service,</li>
-      <li>de dommages résultant de bugs, interruptions ou vulnérabilités techniques.</li>
-    </ul>
-  </section>
+        <section id="responsabilite">
+            <h2>Clause de responsabilité</h2>
+            <p>Les informations fournies par SkinScan‑AI sont données à titre indicatif, informatif et éducatif. Elles ne remplacent en aucun cas un avis médical professionnel.</p>
+            <p>SkinScan‑AI ne saurait être tenu responsable :</p>
+            <ul>
+                <li>d'une mauvaise interprétation des résultats affichés,</li>
+                <li>d'une utilisation détournée ou hors cadre du service,</li>
+                <li>de dommages résultant de bugs, interruptions ou vulnérabilités techniques.</li>
+            </ul>
+        </section>
 
-  <section id="donnees-personnelles">
-    <h2>6. Données personnelles et RGPD</h2>
-    <p>SkinScan‑AI ne collecte aucune donnée personnelle nominative (ni nom, ni email, ni adresse IP enregistrée).</p>
-    <p>Les images analysées sont :</p>
-    <ul>
-      <li>non identifiables,</li>
-      <li>non stockées durablement,</li>
-      <li>traitées localement ou temporairement à des fins de démonstration uniquement.</li>
-    </ul>
-    <p>SkinScan‑AI respecte les principes suivants du RGPD :</p>
-    <ul>
-      <li><strong>Minimisation des données :</strong> traitement limité à ce qui est strictement nécessaire</li>
-      <li><strong>Sécurité :</strong> communications chiffrées (HTTPS), traitement temporaire en mémoire</li>
-      <li><strong>Transparence :</strong> aucune finalité commerciale, aucun transfert de données</li>
-      <li>Aucune prise de décision automatisée à impact juridique</li>
-    </ul>
-  </section>
+        <section id="donnees-personnelles">
+            <h2>Données personnelles et RGPD</h2>
+            <p>SkinScan‑AI ne collecte aucune donnée personnelle nominative (ni nom, ni email, ni adresse IP enregistrée).</p>
+            <p>Les images analysées sont :</p>
+            <ul>
+                <li>non identifiables,</li>
+                <li>non stockées durablement,</li>
+                <li>traitées localement ou temporairement à des fins de démonstration uniquement.</li>
+            </ul>
+            <p>SkinScan‑AI respecte les principes suivants du RGPD :</p>
+            <ul>
+                <li><strong>Minimisation des données :</strong> traitement limité à ce qui est strictement nécessaire</li>
+                <li><strong>Sécurité :</strong> communications chiffrées (HTTPS), traitement temporaire en mémoire</li>
+                <li><strong>Transparence :</strong> aucune finalité commerciale, aucun transfert de données</li>
+                <li>Aucune prise de décision automatisée à impact juridique</li>
+            </ul>
+        </section>
 
-  <section id="vos-droits">
-    <h2>7. Vos droits</h2>
-    <p>Si à l’avenir un traitement de données personnelles est mis en place :</p>
-    <ul>
-      <li>Vous disposerez des droits d’accès, rectification, opposition, suppression, limitation et portabilité</li>
-      <li>Vous pourrez contacter notre DPO à : <em>[adresse mail RGPD]</em></li>
-      <li>Vous pourrez exercer un recours auprès de la CNIL (<a href="https://www.cnil.fr">www.cnil.fr</a>)</li>
-    </ul>
-  </section>
+        <section id="vos-droits">
+            <h2>Vos droits</h2>
+            <p>Si à l'avenir un traitement de données personnelles est mis en place :</p>
+            <ul>
+                <li>Vous disposerez des droits d'accès, rectification, opposition, suppression, limitation et portabilité</li>
+                <li>Vous pourrez contacter notre DPO à : <em>[adresse mail RGPD]</em></li>
+                <li>Vous pourrez exercer un recours auprès de la CNIL (<a href="https://www.cnil.fr">www.cnil.fr</a>)</li>
+            </ul>
+        </section>
 
-  <section id="cookies">
-    <h2>8. Cookies</h2>
-    <p>Le site n’utilise aucun cookie de tracking publicitaire ou de mesure d’audience tiers. Seuls des cookies techniques temporaires peuvent être utilisés pour le bon fonctionnement de l’application.</p>
-  </section>
+        <section id="cookies">
+            <h2>Cookies</h2>
+            <p>Le site n'utilise aucun cookie de tracking publicitaire ou de mesure d'audience tiers. Seuls des cookies techniques temporaires peuvent être utilisés pour le bon fonctionnement de l'application.</p>
+        </section>
 
-  <section id="securite">
-    <h2>9. Sécurité</h2>
-    <p>SkinScan‑AI met en œuvre les mesures de sécurité suivantes :</p>
-    <ul>
-      <li>Chiffrement des flux (HTTPS)</li>
-      <li>Pas de stockage sur disque des images traitées</li>
-      <li>Aucun accès non autorisé aux systèmes internes</li>
-      <li>Surveillance minimale des erreurs techniques</li>
-    </ul>
-    <p>Les utilisateurs sont responsables de la sécurité de leur propre environnement (appareil, navigateur, réseau).</p>
-  </section>
+        <section id="securite">
+            <h2>Sécurité</h2>
+            <p>SkinScan‑AI met en œuvre les mesures de sécurité suivantes :</p>
+            <ul>
+                <li>Chiffrement des flux (HTTPS)</li>
+                <li>Pas de stockage sur disque des images traitées</li>
+                <li>Aucun accès non autorisé aux systèmes internes</li>
+                <li>Surveillance minimale des erreurs techniques</li>
+            </ul>
+            <p>Les utilisateurs sont responsables de la sécurité de leur propre environnement (appareil, navigateur, réseau).</p>
+        </section>
 
-  <section id="droit-applicable">
-    <h2>10. Droit applicable</h2>
-    <p>Le présent site est soumis au droit français. En cas de litige, seul le tribunal de Paris sera compétent, sauf dispositions légales contraires.</p>
-  </section>
+        <section id="droit-applicable">
+            <h2>Droit applicable</h2>
+            <p>Le présent site est soumis au droit français. En cas de litige, seul le tribunal de Paris sera compétent, sauf dispositions légales contraires.</p>
+        </section>
 
+        <div class="privacy-footer">
+            <p>Dernière mise à jour : Mai 2025 | <a href="/">Retour à l'accueil</a></p>
+        </div>
     </div>
 </section>
 {% endblock %}
