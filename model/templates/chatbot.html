@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}SkinScan-AI | Assistant Virtuel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="chatbot-hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Assistant Virtuel SkinScan-AI</h1>
+            <p>Posez vos questions sur la santé de la peau et les différentes affections cutanées</p>
+        </div>
+    </div>
+</section>
+
+<section class="chatbot-section">
+    <div class="container">
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <div class="chatbot-title">
+                    <i class="fas fa-robot"></i>
+                    <h2>Assistant Dermatologue IA</h2>
+                </div>
+                <div class="chatbot-status online">
+                    <span class="status-dot"></span>
+                    <span class="status-text">En ligne</span>
+                </div>
+            </div>
+            
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="message bot">
+                    <div class="message-content">
+                        <p>Bonjour ! Je suis l'assistant virtuel de SkinScan-AI. Je peux vous informer sur les différents types de lésions cutanées, les symptômes à surveiller et quand consulter un professionnel de santé. Comment puis-je vous aider aujourd'hui ?</p>
+                    </div>
+                    <div class="message-time">Aujourd'hui</div>
+                </div>
+            </div>
+            
+            <div class="chatbot-inputa">
+                <textarea id="user-inputa" placeholder="Tapez votre message ici..." rows="1"></textarea>
+                <button id="send-button" class="btn-send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            
+            <div class="chatbot-suggestions">
+                <div class="suggestion-title">Questions fréquentes :</div>
+                <div class="suggestion-chips">
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Qu'est-ce qu'un mélanome ?</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Comment reconnaître une lésion suspecte ?</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Quand consulter un dermatologue ?</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion(this)">Comment prévenir le cancer de la peau ?</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbot-info">
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="info-content">
+                    <h3>À propos de l'assistant</h3>
+                    <p>Cet assistant virtuel utilise l'intelligence artificielle pour répondre à vos questions sur la santé de la peau. Il peut vous informer sur les différentes affections cutanées, mais ne remplace en aucun cas l'avis d'un professionnel de santé.</p>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Confidentialité</h3>
+                    <p>Vos conversations avec l'assistant sont privées et ne sont pas stockées de manière permanente. Nous respectons votre vie privée et ne partageons pas vos données avec des tiers.</p>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Consultation médicale</h3>
+                    <p>En cas de doute sur une lésion cutanée, nous vous recommandons toujours de consulter un dermatologue pour un examen professionnel. La détection précoce est essentielle pour le traitement des cancers de la peau.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}
